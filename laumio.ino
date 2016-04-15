@@ -15,11 +15,13 @@
 
 #include <Adafruit_NeoPixel.h>
 
-// NeoPixel stick DIN pin
 #define DIN_PIN D4
 
-// How many NeoPixels on the stick?
 #define NUM_PIXELS 13
+
+#include <ESP8266WiFi.h>
+
+#include "wifi-config.h"
 
 Adafruit_NeoPixel strip =
 Adafruit_NeoPixel(NUM_PIXELS, DIN_PIN, NEO_GRB + NEO_KHZ800);
@@ -35,12 +37,50 @@ void setup()
     delay(pause);
 }
 
+enum State { off, start, wifi_sta_connecting, wifi_stat_connected, ready };
+State laumio_state = start;
+State laumio_previous_state = off;
+
 void loop()
 {
-    colorWipe(strip.Color(255, 0, 0), 50);
-    colorWipe(strip.Color(0, 255, 0), 50);
-    colorWipe(strip.Color(0, 0, 255), 50);
-    rainbowCycle(10);
+    if (laumio_previous_state != laumio_state) {
+        laumio_previous_state = laumio_state;
+
+        switch (laumio_state) {
+        case ready:
+            colorWipe(strip.Color(0, 0, 0), 50);
+            break;
+        case wifi_sta_connecting:
+            Serial.println();
+            Serial.print("Connecting to ");
+            Serial.println(wifi_ssid);
+            WiFi.begin(wifi_ssid, wifi_password);
+            break;
+        }
+    }
+
+    switch (laumio_state) {
+    case start:
+        colorWipe(strip.Color(255, 0, 0), 50);
+        colorWipe(strip.Color(0, 0, 0), 50);
+        laumio_state = wifi_sta_connecting;
+        break;
+    case wifi_sta_connecting:
+        if (WiFi.status() != WL_CONNECTED) {
+            colorWipe(strip.Color(0, 255, 0), 50);
+            colorWipe(strip.Color(0, 0, 0), 50);
+        } else {
+            laumio_state = wifi_stat_connected;
+        }
+        break;
+    case wifi_stat_connected:
+        rainbowCycle(1);
+        laumio_state = ready;
+        break;
+    case ready:
+        break;
+
+    }
 }
 
 // Fill the dots one after the other with a color
