@@ -19,13 +19,16 @@
 #include "wifi-config.h"
 
 #include "LaumioLeds.h"
+#include "LaumioHttp.h"
 
 LaumioLeds leds(NUM_PIXELS, DIN_PIN);
+LaumioHttp httpServer;
 
 void setup()
 {
     Serial.begin(115200);
     leds.begin();
+    httpServer.begin();
     delay(1000);
 }
 
@@ -70,6 +73,7 @@ void loop()
         laumio_state = ready;
         break;
     case ready:
+        httpServer.handleClient();
         break;
     }
 }
