@@ -29,7 +29,7 @@ void setup()
     delay(1000);
 }
 
-enum State { off, start, wifi_sta_connecting, wifi_stat_connected, ready };
+enum State { off, start, wifi_sta_connecting, wifi_sta_connected, ready };
 State laumio_state = start;
 State laumio_previous_state = off;
 
@@ -62,10 +62,10 @@ void loop()
             leds.animate(LaumioLeds::Animation::Loading);
         } else {
             Serial.println("Wi-Fi: Connected.");
-            laumio_state = wifi_stat_connected;
+            laumio_state = wifi_sta_connected;
         }
         break;
-    case wifi_stat_connected:
+    case wifi_sta_connected:
         leds.animate(LaumioLeds::Animation::Happy);
         laumio_state = ready;
         break;
