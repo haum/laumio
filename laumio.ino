@@ -52,8 +52,9 @@ void loop()
             break;
         case wifi_sta_connecting:
             Serial.println();
-            Serial.print("Connecting to ");
-            Serial.println(wifi_ssid);
+            Serial.print("Wi-Fi: Connecting to '");
+            Serial.print(wifi_ssid);
+            Serial.println("' ...");
             WiFi.begin(wifi_ssid, wifi_password);
             break;
         }
@@ -70,6 +71,7 @@ void loop()
             colorWipe(strip.Color(0, 255, 0), 50);
             colorWipe(strip.Color(0, 0, 0), 50);
         } else {
+            Serial.println("Wi-Fi: Connected.");
             laumio_state = wifi_stat_connected;
         }
         break;
@@ -79,7 +81,6 @@ void loop()
         break;
     case ready:
         break;
-
     }
 }
 
