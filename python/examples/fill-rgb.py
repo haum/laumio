@@ -7,10 +7,10 @@ from laumio import *
 
 def print_usage():
     print(
-"Usage: rgb.py R G B\n\
+"Usage: "+sys.argv[0]+" R G B\n\
 \n\
     example:\n\
-        rgb.py 255 255 255\n\
+        "+sys.argv[0]+" 255 255 255\n\
 ")
     sys.exit(1)
 
