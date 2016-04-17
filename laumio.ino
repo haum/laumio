@@ -20,15 +20,18 @@
 
 #include "LaumioLeds.h"
 #include "LaumioHttp.h"
+#include "LaumioApi.h"
 
 LaumioLeds leds(NUM_PIXELS, DIN_PIN);
 LaumioHttp httpServer;
+LaumioApi api(leds, httpServer);
 
 void setup()
 {
     Serial.begin(115200);
     leds.begin();
     httpServer.begin();
+    api.begin();
     delay(1000);
 }
 

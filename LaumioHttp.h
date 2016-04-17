@@ -16,7 +16,10 @@ class LaumioHttp {
   private:
 
      ESP8266WebServer server;
+
     void handleNotFound();
+
+    friend class LaumioApi;
 };
 
 #endif                          // LAUMIOHTTP_H
