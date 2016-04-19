@@ -13,6 +13,9 @@ class Laumio:
         response = self.send(payload)
         print(response)
 
+    def status(self):
+        return self.__http.urlopen('GET', self.__url)
+
     def send(self, payload):
         print(payload)
         return self.__http.urlopen('POST', self.__url, body=payload).read()
