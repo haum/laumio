@@ -13,6 +13,11 @@ class Laumio:
         response = self.send(payload)
         print(response)
 
+    def setPixelColor(self, pixel, r, g, b):
+        payload = '{led:'+str(pixel)+',rgb:['+str(r)+','+str(g)+','+str(b)+']}'
+        response = self.send(payload)
+        print(response)
+
     def status(self):
         return self.__http.urlopen('GET', self.__url)
 
