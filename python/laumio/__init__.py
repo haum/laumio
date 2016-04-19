@@ -23,4 +23,4 @@ class Laumio:
 
     def send(self, payload):
         print(payload)
-        return self.__http.urlopen('POST', self.__url, body=payload).read()
+        return self.__http.urlopen('POST', self.__url, body=payload).data
