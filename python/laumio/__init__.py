@@ -8,7 +8,7 @@ class Laumio:
         self.__url = 'http://'+str(ip)+'/api/'
         self.__http = urllib3.PoolManager()
 
-    def fill(self, r, g, b):
+    def fillColor(self, r, g, b):
         payload = '{led:255,rgb:['+str(r)+','+str(g)+','+str(b)+']}'
         response = self.send(payload)
         print(response)

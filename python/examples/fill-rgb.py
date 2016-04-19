@@ -29,5 +29,5 @@ try:
 except ValueError:
     print_usage()
 
-l = Laumio("192.168.37.141")
-l.fill(r, g, b)
+l = Laumio("172.28.172.3")
+l.fillColor(r, g, b)
