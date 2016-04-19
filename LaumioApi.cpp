@@ -36,10 +36,11 @@ void LaumioApi::interpretJson(JsonObject & jo)
             leds.setPixelColor(led, r, g, b);
         }
         leds.show();
+	server.send(200, "text/plain", "Success");
+    } else {
+	server.send(400, "text/plain", "Invalid request");
     }
-    server.send(200, "text/plain", "ok");
 }
-
 
 void LaumioApi::handleApi()
 {
