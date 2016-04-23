@@ -31,7 +31,7 @@ void LaumioApi::interpretJson(JsonObject & jo)
 
         // if led = 255 set all LEDs to rgb value
         if (led == 255) {
-            leds.fill(r, g, b);
+            leds.fillColor(r, g, b);
         } else {
             leds.setPixelColor(led, r, g, b);
         }

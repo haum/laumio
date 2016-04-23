@@ -17,7 +17,7 @@ class LaumioLeds {
      LaumioLeds(uint16_t n, uint8_t p);
     void begin();
     void animate(Animation a);
-    void fill(const uint8_t & r, const uint8_t & g, const uint8_t & b);
+    void fillColor(const uint8_t & r, const uint8_t & g, const uint8_t & b);
     int count();
     void setPixelColor(const int led, const uint8_t & r, const uint8_t & g,
                        const uint8_t & b);
