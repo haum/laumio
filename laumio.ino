@@ -21,10 +21,12 @@
 #include "LaumioLeds.h"
 #include "LaumioHttp.h"
 #include "LaumioApi.h"
+#include "LaumioUdpRemoteControl.h"
 
 LaumioLeds leds(NUM_PIXELS, DIN_PIN);
 LaumioHttp httpServer;
 LaumioApi api(leds, httpServer);
+LaumioUdpRemoteControl udpRC(leds);
 
 void setup()
 {
@@ -73,10 +75,12 @@ void loop()
         break;
     case wifi_sta_connected:
         leds.animate(LaumioLeds::Animation::Happy);
+        udpRC.begin();
         laumio_state = ready;
         break;
     case ready:
         httpServer.handleClient();
+        udpRC.handleMessage();
         break;
     }
 }

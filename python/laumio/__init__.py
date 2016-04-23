@@ -1,20 +1,19 @@
 #/usr/bin/env python3
 
-import urllib3
+import socket
 
 class Laumio:
     def __init__(self, ip):
         self.__ip = ip
         self.__url = 'http://'+str(ip)+'/api/'
-        self.__http = urllib3.PoolManager()
 
     def fillColor(self, r, g, b):
-        payload = '{led:255,rgb:['+str(r)+','+str(g)+','+str(b)+']}'
+        payload = bytearray([ 255, r, g, b ])
         response = self.send(payload)
         print(response)
 
     def setPixelColor(self, pixel, r, g, b):
-        payload = '{led:'+str(pixel)+',rgb:['+str(r)+','+str(g)+','+str(b)+']}'
+        payload = bytearray([ pixel, r, g, b ])
         response = self.send(payload)
         print(response)
 
@@ -22,5 +21,7 @@ class Laumio:
         return self.__http.urlopen('GET', self.__url)
 
     def send(self, payload):
-        print(payload)
-        return self.__http.urlopen('POST', self.__url, body=payload).data
+        sock = socket.socket(socket.AF_INET, # Internet
+                     socket.SOCK_DGRAM) # UDP
+        sock.sendto(payload, (self.__ip, 6969))
+        return "XXX"
