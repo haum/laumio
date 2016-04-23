@@ -25,7 +25,7 @@ void LaumioLeds::setPixelColor(const int led, const uint8_t & r,
 }
 
 void LaumioLeds::fillColor(const uint8_t & r,
-                      const uint8_t & g, const uint8_t & b)
+                           const uint8_t & g, const uint8_t & b)
 {
     for (uint16_t i = 0; i < strip.numPixels(); i++) {
         strip.setPixelColor(i, r, g, b);
