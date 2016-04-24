@@ -1,5 +1,7 @@
 #include "LaumioUdpRemoteControl.h"
 
+#include <ESP8266mDNS.h>
+
 LaumioUdpRemoteControl::LaumioUdpRemoteControl(LaumioLeds & l)
 :  leds(l)
 {
@@ -8,7 +10,7 @@ LaumioUdpRemoteControl::LaumioUdpRemoteControl(LaumioLeds & l)
 void LaumioUdpRemoteControl::begin()
 {
     udpServer.begin(6969);
-
+    MDNS.addService("laumiorc", "udp", 6969);
 }
 
 void LaumioUdpRemoteControl::interpretUdpMessage(char *buffer)

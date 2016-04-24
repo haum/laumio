@@ -18,6 +18,8 @@
 #include <ESP8266WiFi.h>
 #include "wifi-config.h"
 
+#include <ESP8266mDNS.h>
+
 #include "LaumioLeds.h"
 #include "LaumioHttp.h"
 #include "LaumioApi.h"
@@ -28,6 +30,8 @@ LaumioHttp httpServer;
 LaumioApi api(leds, httpServer);
 LaumioUdpRemoteControl udpRC(leds);
 
+char hostString[16] = { 0 };
+
 void setup()
 {
     Serial.begin(115200);
@@ -35,6 +39,11 @@ void setup()
     httpServer.begin();
     api.begin();
     delay(1000);
+
+    sprintf(hostString, "Laumio_%06X", ESP.getChipId());
+    Serial.print("Hostname: ");
+    Serial.println(hostString);
+    WiFi.hostname(hostString);
 }
 
 enum State { off, start, wifi_sta_connecting, wifi_sta_connected, ready };
@@ -76,6 +85,7 @@ void loop()
     case wifi_sta_connected:
         leds.animate(LaumioLeds::Animation::Happy);
         udpRC.begin();
+        MDNS.begin(hostString);
         laumio_state = ready;
         break;
     case ready:
