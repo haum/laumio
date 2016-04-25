@@ -35,6 +35,7 @@ char hostString[16] = { 0 };
 void setup()
 {
     Serial.begin(115200);
+    Serial.println();
     leds.begin();
     httpServer.begin();
     api.begin();
