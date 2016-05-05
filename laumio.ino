@@ -1,7 +1,6 @@
 /*
  * Connections:
- * D4 --- DIN
- * 3V3 -- 5VDC
+ * D3 --- DIN
  * G ---- GND (either)
  *
  * Adafruit recommendations:
@@ -12,7 +11,7 @@
  * Dependencies:
  * https://github.com/adafruit/Adafruit_NeoPixel
  */
-#define DIN_PIN D4
+#define DIN_PIN D3
 #define NUM_PIXELS 13
 
 #include <ESP8266WiFi.h>
@@ -72,6 +71,7 @@ void loop()
     switch (laumio_state) {
     case start:
         leds.animate(LaumioLeds::Animation::Hello);
+
         laumio_state = wifi_sta_connecting;
         break;
     case wifi_sta_connecting:
