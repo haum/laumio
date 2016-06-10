@@ -10,8 +10,13 @@
  *
  * Dependencies:
  * https://github.com/adafruit/Adafruit_NeoPixel
+ * https://github.com/bblanchon/ArduinoJson
  */
+
+// Si ancienne version
+//#define DIN_PIN D4
 #define DIN_PIN D3
+
 #define NUM_PIXELS 13
 
 #include <ESP8266WiFi.h>
