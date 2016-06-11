@@ -20,10 +20,9 @@
 #define NUM_PIXELS 13
 
 #include <ESP8266WiFi.h>
-#include "wifi-config.h"
-
 #include <ESP8266mDNS.h>
 
+#include "LaumioConnect.h"
 #include "LaumioLeds.h"
 #include "LaumioHttp.h"
 #include "LaumioApi.h"
@@ -33,6 +32,8 @@ LaumioLeds leds(NUM_PIXELS, DIN_PIN);
 LaumioHttp httpServer;
 LaumioApi api(leds, httpServer);
 LaumioUdpRemoteControl udpRC(leds);
+
+LaumioConnect conn;
 
 char hostString[16] = { 0 };
 
@@ -47,7 +48,9 @@ void setup()
     sprintf(hostString, "Laumio_%06X", ESP.getChipId());
     Serial.print("Hostname: ");
     Serial.println(hostString);
-    WiFi.hostname(hostString);
+    
+    conn.setHostname(hostString);
+    //conn.begin();
 }
 
 enum State { off, start, wifi_sta_connecting, wifi_sta_connected, ready };
@@ -56,6 +59,7 @@ State laumio_previous_state = off;
 
 void loop()
 {
+    // Changement d'état
     if (laumio_previous_state != laumio_state) {
         laumio_previous_state = laumio_state;
 
@@ -66,9 +70,10 @@ void loop()
         case wifi_sta_connecting:
             Serial.println();
             Serial.print("Wi-Fi: Connecting to '");
-            Serial.print(wifi_ssid);
+            Serial.print(conn.getAPName());
             Serial.println("' ...");
-            WiFi.begin(wifi_ssid, wifi_password);
+            
+            conn.begin();
             break;
         }
     }
@@ -80,7 +85,7 @@ void loop()
         laumio_state = wifi_sta_connecting;
         break;
     case wifi_sta_connecting:
-        if (WiFi.status() != WL_CONNECTED) {
+        if (!conn.isConnected()) {
             leds.animate(LaumioLeds::Animation::Loading);
         } else {
             Serial.println("Wi-Fi: Connected.");
