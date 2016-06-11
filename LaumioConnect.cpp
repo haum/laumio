@@ -5,6 +5,7 @@
 #include "wifi-config.h"
 
 LaumioConnect::LaumioConnect() {
+    EEPROM.begin(512);
 }
 
 void LaumioConnect::begin() {
