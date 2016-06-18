@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# sh ring.sh | socat - udp-sendto:Laumio_10508F.local:6969
-
+# Consts
 ANIM_TIME=0.05
 PAUSE_TIME=0.3
 
+# Utils
 fill() {
 	echo -e "\xff\x$1\x$2\x$3"
 }
@@ -17,6 +17,8 @@ ring() {
 	echo -e "\x01\x$1\x$2\x$3\x$4"
 }
 
+# Program
+(
 fill 00 00 00
 
 while true; do
@@ -37,3 +39,4 @@ while true; do
 	led 9 00 00 00
 	sleep 1
 done
+) | socat - udp-sendto:Laumio_104B2E.local:6969
