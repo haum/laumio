@@ -24,7 +24,8 @@ upload:
 indent:
 	indent -kr --no-tabs laumio/*.ino laumio/*.cpp laumio/*.h
 
-clean: mrproper
-
-mrproper:
+clean:
 	rm *~
+	rm -R build
+
+mrproper: clean
