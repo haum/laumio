@@ -9,11 +9,11 @@ LaumioConnect::LaumioConnect() {
 }
 
 void LaumioConnect::begin() {
-    if (hasSavedAP()) {
+    /*if (hasSavedAP()) {
         connectToSavedAP();
-    } else {
+    } else {*/
         connectToDefaultAP();
-    }
+    /*}*/
 }
 
 // Wifi
@@ -54,12 +54,12 @@ void LaumioConnect::connectToDefaultAP() {
 }
 
 String LaumioConnect::getAPName() {
-    if (hasSavedAP()) {
+    /*if (hasSavedAP()) {
         String ssid, pass;
         readAPFromEEPROM(ssid, pass);
         
         return ssid;
-    }
+    }*/
     
     return DEFAULT_WIFI_SSID;
 }

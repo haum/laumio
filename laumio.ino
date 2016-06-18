@@ -14,8 +14,8 @@
  */
 
 // Si ancienne version
-//#define DIN_PIN D4
-#define DIN_PIN D3
+#define DIN_PIN D4
+//#define DIN_PIN D3
 
 #define NUM_PIXELS 13
 
@@ -39,7 +39,7 @@ LaumioAP ap(httpServer);
 LaumioConnect conn;
 int connectCounter = 0;
 
-char const *AP_PASS = "laumio";
+char const *AP_PASS = "";
 
 char hostString[16] = { 0 };
 
@@ -83,6 +83,7 @@ void loop()
             conn.begin();
             break;
         case wifi_sta_abort:
+            leds.colorWipe(0xff3c00, 100);
             ap.begin(hostString, AP_PASS);
             break;
         }
