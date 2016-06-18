@@ -22,7 +22,7 @@ upload:
 	$(TARGET).ino
 
 indent:
-	indent -kr --no-tabs *.ino *.cpp *.h
+	indent -kr --no-tabs laumio/*.ino laumio/*.cpp laumio/*.h
 
 clean: mrproper
 
