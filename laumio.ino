@@ -14,8 +14,8 @@
  */
 
 // Si ancienne version
-#define DIN_PIN D4
-//#define DIN_PIN D3
+//#define DIN_PIN D4
+#define DIN_PIN D3
 
 #define NUM_PIXELS 13
 
@@ -54,7 +54,7 @@ void setup()
     sprintf(hostString, "Laumio_%06X", ESP.getChipId());
     Serial.print("Hostname: ");
     Serial.println(hostString);
-    
+
     conn.setHostname(hostString);
 }
 
@@ -80,7 +80,7 @@ void loop()
             Serial.print("Wi-Fi: Connecting to '");
             Serial.print(conn.getAPName());
             Serial.println("' ...");
-            
+
             conn.begin();
             break;
         case wifi_sta_abort:
@@ -101,7 +101,7 @@ void loop()
         if (!conn.isConnected()) {
             leds.animate(LaumioLeds::Animation::Loading);
             connectCounter++;
-            
+
             if (connectCounter > 10) {
                 laumio_state = wifi_sta_abort;
                 Serial.println("Wi-Fi: Too long, abort.");

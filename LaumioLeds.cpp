@@ -62,7 +62,7 @@ void LaumioLeds::setRingColor(int ring, uint8_t r, uint8_t g, uint8_t b)
 
     if (pring) {
         for (int i = 0; i < 4; i++) {
-            leds.setPixelColor(pring[i], buffer[2], buffer[3], buffer[4]);
+            strip.setPixelColor(pring[i], r, g, b);
         }
     }
 }
