@@ -4,5 +4,7 @@ all:
 indent:
 	indent -kr --no-tabs *.ino *.cpp *.h
 
+clean: mrproper
+
 mrproper:
 	rm *~
