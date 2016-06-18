@@ -36,16 +36,16 @@ void LaumioConnect::saveAP(String ssid, String pass) {
 bool LaumioConnect::hasSavedAP() {
     String ssid, pass;
     readAPFromEEPROM(ssid, pass);
-    
+
     if (ssid.length() > 1) return true;
-    
+
     return false;
 }
 
 void LaumioConnect::connectToSavedAP() {
     String ssid, pass;
     readAPFromEEPROM(ssid, pass);
-    
+
     WiFi.begin(ssid.c_str(), pass.c_str());
 }
 
@@ -57,10 +57,10 @@ String LaumioConnect::getAPName() {
     /*if (hasSavedAP()) {
         String ssid, pass;
         readAPFromEEPROM(ssid, pass);
-        
+
         return ssid;
     }*/
-    
+
     return DEFAULT_WIFI_SSID;
 }
 
@@ -68,14 +68,14 @@ String LaumioConnect::getAPName() {
 // Private helpers
 
 void LaumioConnect::readAPFromEEPROM(String& ssid, String& pass) {
-    
+
     ssid = "";
     for (int i = 0; i < 32; ++i) {
         ssid += char(EEPROM.read(i));
     }
-    
+
     pass = "";
-    
+
     for (int i = 32; i < 96; ++i) {
         pass += char(EEPROM.read(i));
     }
@@ -95,6 +95,6 @@ void LaumioConnect::saveAPToEEPROM(String ssid, String pass) {
     for (int i = 0; i < pass.length(); ++i) {
         EEPROM.write(32 + i, pass[i]);
     }
-    
+
     EEPROM.commit();
 }
