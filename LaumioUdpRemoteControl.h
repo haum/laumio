@@ -4,6 +4,12 @@
 #include "LaumioLeds.h"
 #include <WiFiUdp.h>
 
+enum class Command {
+    SetPixel = 0,
+    SetRing = 1,
+    Fill = 0xff
+};
+
 class LaumioUdpRemoteControl {
   public:
 

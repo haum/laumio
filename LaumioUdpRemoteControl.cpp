@@ -15,11 +15,23 @@ void LaumioUdpRemoteControl::begin()
 
 void LaumioUdpRemoteControl::interpretUdpMessage(char *buffer)
 {
-    if (buffer[0] == 0xff) {
+    Command command = static_cast < Command > (buffer[0]);
+
+    switch (command) {
+
+    case Command::SetPixel:
+        leds.setPixelColor(buffer[1], buffer[2], buffer[3], buffer[4]);
+        break;
+
+    case Command::SetRing:
+        leds.setRingColor(buffer[1], buffer[2], buffer[3], buffer[4]);
+        break;
+
+    case Command::Fill:
         leds.fillColor(buffer[1], buffer[2], buffer[3]);
-    } else {
-        leds.setPixelColor(buffer[0], buffer[1], buffer[2], buffer[3]);
+        break;
     }
+
     leds.show();
 }
 

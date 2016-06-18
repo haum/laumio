@@ -63,6 +63,7 @@ void loop()
         case ready:
             leds.animate(LaumioLeds::Animation::Clear);
             break;
+
         case wifi_sta_connecting:
             Serial.println();
             Serial.print("Wi-Fi: Connecting to '");
