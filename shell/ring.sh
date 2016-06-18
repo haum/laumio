@@ -20,6 +20,7 @@ ring() {
 # Program
 (
 fill 00 00 00
+sleep $ANIM_TIME
 
 while true; do
 	ring 0 00 ff 00
