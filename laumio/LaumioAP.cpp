@@ -1,9 +1,11 @@
 #include "LaumioAP.h"
 
-LaumioAP::LaumioAP(LaumioHttp& h) : server(h.server) {
+LaumioAP::LaumioAP(LaumioHttp & h):server(h.server)
+{
 }
 
-void LaumioAP::begin(char* ssid, char const* pass) {
+void LaumioAP::begin(char *ssid, char const *pass)
+{
 
     WiFi.mode(WIFI_AP);
     WiFi.softAP(ssid, pass);
@@ -15,7 +17,8 @@ void LaumioAP::begin(char* ssid, char const* pass) {
     server.onNotFound(std::bind(&LaumioAP::handleRedirectAP, this));
 }
 
-void LaumioAP::acceptDNS() {
+void LaumioAP::acceptDNS()
+{
     dns.processNextRequest();
 }
 
@@ -34,7 +37,8 @@ const char hello_html[] = {
     0x0a, 0x3c, 0x68, 0x74, 0x6d, 0x6c, 0x3e, 0x0a, 0x00
 };
 
-void LaumioAP::handleConfig() {
+void LaumioAP::handleConfig()
+{
     if (server.hostHeader() != apip.toString()) {
         handleRedirectAP();
         return;
@@ -43,12 +47,13 @@ void LaumioAP::handleConfig() {
     server.send(200, "text/html", hello_html);
 }
 
-void LaumioAP::handleRedirectAP() {
+void LaumioAP::handleRedirectAP()
+{
     // Pas de cache pour ne pas casser la connexion de l'utilisateur lorsqu'il
     // se déconnecte du portail captif
     String header = String("HTTP/1.1 301 OK\r\n") +
-            String("Location: http://") + apip.toString() + String("/config\r\n") +
-            String("Cache-Control: no-cache\r\n\r\n");
+        String("Location: http://") + apip.toString() +
+        String("/config\r\n") + String("Cache-Control: no-cache\r\n\r\n");
 
     server.sendContent(header);
 }

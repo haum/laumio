@@ -58,7 +58,8 @@ void setup()
     conn.setHostname(hostString);
 }
 
-enum State { off, start, wifi_sta_connecting, wifi_sta_connected, wifi_sta_abort, ready };
+enum State { off, start, wifi_sta_connecting, wifi_sta_connected,
+        wifi_sta_abort, ready };
 State laumio_state = start;
 State laumio_previous_state = off;
 
@@ -89,7 +90,6 @@ void loop()
             break;
         }
     }
-
     // État
     switch (laumio_state) {
     case start:

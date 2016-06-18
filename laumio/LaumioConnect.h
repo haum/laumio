@@ -4,27 +4,26 @@
 #include <ESP8266WiFi.h>
 
 class LaumioConnect {
-public:
+  public:
     LaumioConnect();
-    
+
     void begin();
-    
+
     // Wifi
     void setHostname(String hostname);
     bool isConnected();
-    
+
     // AP
     void saveAP(String ssid, String pass);
     bool hasSavedAP();
     void connectToDefaultAP();
     void connectToSavedAP();
-    
+
     String getAPName();
 
-private:
-    void readAPFromEEPROM(String& ssid, String& pass);
+  private:
+    void readAPFromEEPROM(String & ssid, String & pass);
     void saveAPToEEPROM(String ssid, String pass);
 };
 
-#endif /* LAUMIOCONNECT_H */
-
+#endif                          /* LAUMIOCONNECT_H */

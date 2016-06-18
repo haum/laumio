@@ -8,22 +8,22 @@
 #include "LaumioHttp.h"
 
 class LaumioAP {
-public:
-    LaumioAP(LaumioHttp& h);
+  public:
+    LaumioAP(LaumioHttp & h);
 
-    void begin(char *ssid, char const* pass);
+    void begin(char *ssid, char const *pass);
     void acceptDNS();
 
 
-private:
+  private:
 
     void handleConfig();
     void handleRedirectAP();
 
     IPAddress apip;
     DNSServer dns;
-    ESP8266WebServer& server;
+     ESP8266WebServer & server;
 
 };
 
-#endif /* LAUMIOAP_H */
+#endif                          /* LAUMIOAP_H */
