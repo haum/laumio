@@ -40,7 +40,6 @@ able to compile and flash it.
 Once flashed and started, the Laumio will look for the specified Wifi network (see
 ``wifi-config.h``) and wait for UDP or HTTP instructions.
 
-An animation engine is implemented but **not exposed yet**.
 
 .. _Ikea FADO lamp: http://www.ikea.com/us/en/catalog/products/70096377/
 .. _ESP Wemos d1 Mini: http://www.wemos.cc/Products/d1_mini.html
