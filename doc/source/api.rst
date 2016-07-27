@@ -1,7 +1,8 @@
 Laumio's anatomy and HEX commands
 =================================
 
-The Laumio can be controlled using the bare-UDP API using simple HEX commands.
+The Laumio can be controlled using the bare-UDP API using simple HEX commands sent on the
+**port 6969**. It can alternatively receive commands from a REST API.
 Three different features can be set : the pixel, ring and the whole Laumio at once.
 
 The leds are disposed in 4 branches of three LED plus one at the top. They are numbered
@@ -14,8 +15,6 @@ bottom to top.
 
 Bare UDP
 --------
-
-all the data is send on port 6969 (this can be changed in ESP code )
 
 Pixel-wise control
 ******************
