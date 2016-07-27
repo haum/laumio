@@ -4,6 +4,7 @@ Laumio's anatomy and HEX commands
 The Laumio can be controlled using the bare-UDP API using simple HEX commands sent on the
 **port 6969**. It can alternatively receive commands from a REST API.
 Three different features can be set : the pixel, ring and the whole Laumio at once.
+Additionnaly, some animations can be triggered.
 
 The leds are disposed in 4 branches of three LED plus one at the top. They are numbered
 starting from the bottom of one branch to its top, skipping the led at the center, going
@@ -38,6 +39,28 @@ Full span control
 The command is ``0xff`` and the only thing to specify is the RGB color::
 
   0xff R G B
+
+Animations
+**********
+
+This is still a work in progress but 2 animations can be triggered on the Laumio.
+
+Color Wipe
+~~~~~~~~~~
+
+The color wipe animation changes the color on the full Laumio one LED at a time. It takes
+two parameters, the 3 bytes of color and the delay between two LED::
+
+  0x0b R G B Delay
+
+Rainbow
+~~~~~~~
+
+The rainbow animation takes no parameters, it's the one used when the Laumio manage to
+connect to a Wifi network::
+
+  0x0a
+
 
 JSON API
 --------
