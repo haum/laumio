@@ -15,6 +15,8 @@ bottom to top.
 Bare UDP
 --------
 
+all the data is send on port 6969 (this can be changed in ESP code )
+
 Pixel-wise control
 ******************
 
