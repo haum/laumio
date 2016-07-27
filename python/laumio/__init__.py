@@ -4,15 +4,31 @@ import socket
 import urllib.request
 
 class Laumio:
+    """ Laumio's abstraction layer
+
+    ip -- Laumio's IP
+    """
+
     def __init__(self, ip):
         self.__ip = ip
         self.__url = 'http://'+str(ip)+'/api/'
 
     def fillColor(self, r, g, b):
+        """ Set the color of all the leds in the Laumio
+        r -- red byte
+        g -- green byte
+        b -- blue byte
+        """
         payload = bytearray([ 255, r, g, b ])
         return self._send(payload)
 
     def setPixelColor(self, pixel, r, g, b):
+        """ Set the color of all the leds pixel of the Laumio
+        pixel -- LED ID (0~12)
+        r -- red byte
+        g -- green byte
+        b -- blue byte
+        """
         payload = bytearray([ 0, pixel, r, g, b ])
         return self._send(payload)
 
