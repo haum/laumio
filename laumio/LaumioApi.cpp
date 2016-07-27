@@ -8,6 +8,7 @@ LaumioApi::LaumioApi(LaumioLeds & l, LaumioHttp & s)
 void LaumioApi::begin()
 {
     server.on("/api/", std::bind(&LaumioApi::handleApi, this));
+    server.on("/api", std::bind(&LaumioApi::handleApi, this));
 }
 
 void LaumioApi::sendStatus()
