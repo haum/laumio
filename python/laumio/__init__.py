@@ -1,6 +1,7 @@
 #/usr/bin/env python3
 
 import socket
+import urllib.request
 
 class Laumio:
     def __init__(self, ip):
@@ -18,7 +19,9 @@ class Laumio:
         print(response)
 
     def status(self):
-        return self.__http.urlopen('GET', self.__url)
+        """ Get the JSON Laumio status """
+        return urllib.request.urlopen(self.__url).read().decode()
+
 
     def send(self, payload):
         sock = socket.socket(socket.AF_INET, # Internet
