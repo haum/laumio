@@ -56,6 +56,11 @@ class Laumio:
         payload = bytearray([ 0x0b, r, g, b, delay ])
         return self._send(payload)
 
+    def rainbow(self):
+        """ Start Rainbow animation """
+        payload = bytearray([ 0x0a ])
+        return self._send(payload)
+
     def status(self):
         """ Get the JSON Laumio status """
         return urllib.request.urlopen(self.__url).read().decode()
