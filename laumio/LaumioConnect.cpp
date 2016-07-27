@@ -28,6 +28,10 @@ void LaumioConnect::setHostname(String hostname)
 
 bool LaumioConnect::isConnected()
 {
+    if (WiFi.status() == WL_CONNECTED) {
+      Serial.print("IP Address : ");
+      Serial.println(WiFi.localIP());
+    }
     return WiFi.status() == WL_CONNECTED;
 }
 

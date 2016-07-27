@@ -16,6 +16,7 @@ void LaumioUdpRemoteControl::begin()
 void LaumioUdpRemoteControl::interpretUdpMessage(char *buffer)
 {
     Command command = static_cast < Command > (buffer[0]);
+    uint8_t wait = 100;
 
     switch (command) {
 
@@ -25,6 +26,17 @@ void LaumioUdpRemoteControl::interpretUdpMessage(char *buffer)
 
     case Command::SetRing:
         leds.setRingColor(buffer[1], buffer[2], buffer[3], buffer[4]);
+        break;
+
+    case Command::ColorWipe:
+        if (sizeof(buffer)/sizeof(char) > 3) {
+          wait = buffer[4];
+        }
+        leds.colorWipe(buffer[1]<<16 | buffer[2]<<8 | buffer[3], wait);
+        break;
+
+    case Command::AnimateRainbow:
+        leds.rainbowCycle(1);
         break;
 
     case Command::Fill:
