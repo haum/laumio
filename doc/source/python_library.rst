@@ -10,7 +10,7 @@ page`_.
 
     Constructor to control a Laumio responding on IP address *ip*.
 
-  .. py:method:: wipe()
+  .. py:method:: wipeOut()
 
     Shuts down all the LED
 
@@ -29,8 +29,21 @@ page`_.
 
     Set a pixel *pixel*  (0~12) to a given color (*r*, *g*, *b*).
 
+  .. py:method:: colorWipe(r, g, b, delay)
+
+    Start a color wipe animation with color (*r*, *g*, *b*) and inter-LED delay *delay*.
+
+  .. py:method:: rainbow()
+
+    Start a rainbow animation.
+
   .. py:method:: status()
 
     Return the JSON **string** for the Laumio's status
+
+  .. py:method:: _send(payload)
+
+    Conventionnaly private, this method is used to transmit a raw ``bytearray`` payload to
+    a Laumio. It can be used to trigger custom animations.
 
 .. _API page: /api.html
