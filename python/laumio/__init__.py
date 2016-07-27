@@ -26,6 +26,16 @@ class Laumio:
         payload = bytearray([ 255, r, g, b ])
         return self._send(payload)
 
+    def fillRing(self, ringid, r, g, b):
+        """ Set the color of all the leds of ring ringid in the Laumio
+        ringid -- Ring ID (0~2)
+        r -- red byte
+        g -- green byte
+        b -- blue byte
+        """
+        payload = bytearray([ 1, ringid, r, g, b ])
+        return self._send(payload)
+
     def setPixelColor(self, pixel, r, g, b):
         """ Set the color of all the leds pixel of the Laumio
         pixel -- LED ID (0~12)
