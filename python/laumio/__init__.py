@@ -46,6 +46,16 @@ class Laumio:
         payload = bytearray([ 0, pixel, r, g, b ])
         return self._send(payload)
 
+    def colorWipe(self, r, g, b, delay):
+        """ Send colorWipe animation with the specified color and delay
+        r -- red byte
+        g -- green byte
+        b -- blue byte
+        delay -- delay to wait between LED
+        """
+        payload = bytearray([ 0x0b, r, g, b, delay ])
+        return self._send(payload)
+
     def status(self):
         """ Get the JSON Laumio status """
         return urllib.request.urlopen(self.__url).read().decode()
