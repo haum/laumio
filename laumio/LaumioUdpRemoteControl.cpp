@@ -35,6 +35,10 @@ void LaumioUdpRemoteControl::interpretUdpMessage(char *buffer)
         leds.colorWipe(buffer[1]<<16 | buffer[2]<<8 | buffer[3], wait);
         break;
 
+    case Command::AnimateRainbow:
+        leds.rainbowCycle(1);
+        break;
+
     case Command::Fill:
         leds.fillColor(buffer[1], buffer[2], buffer[3]);
         break;
