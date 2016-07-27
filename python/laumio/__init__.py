@@ -13,6 +13,10 @@ class Laumio:
         self.__ip = ip
         self.__url = 'http://'+str(ip)+'/api/'
 
+    def wipe(self):
+        """ Shut down all the LED """
+        return self.fillColor(0, 0, 0)
+
     def fillColor(self, r, g, b):
         """ Set the color of all the leds in the Laumio
         r -- red byte
