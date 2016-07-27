@@ -65,6 +65,9 @@ connect to a Wifi network::
 JSON API
 --------
 
+The JSON API is still a work in progress and every UDP-supported call has not been
+translated yet.
+
 Status
 ******
 
