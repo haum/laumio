@@ -15,15 +15,19 @@ void LaumioApi::sendStatus()
 {
     StaticJsonBuffer < 200 > jsonBuffer;        // Reserve memory space for json
     JsonObject & root = jsonBuffer.createObject();
-    root["name"] = "laumio";
+    root["hostname"] = WiFi.hostname();
     root["version"] = "devel";
     String json;
     root.printTo(json);
-    server.send(200, "text/plain", json);
+    server.send(200, "application/json", json);
 }
 
 void LaumioApi::interpretJson(JsonObject & jo)
 {
+    StaticJsonBuffer < 200 > jsonBuffer;        // Reserve memory space for json
+    JsonObject & root = jsonBuffer.createObject();
+    root["name"] = WiFi.hostname();
+    int status_code = 200;
     if (jo.containsKey("rgb")) {
         const int led = jo["led"];
         const int r = jo["rgb"][0];
@@ -37,10 +41,14 @@ void LaumioApi::interpretJson(JsonObject & jo)
             leds.setPixelColor(led, r, g, b);
         }
         leds.show();
-        server.send(200, "text/plain", "Success");
+        root["status"] = "Success";
     } else {
-        server.send(400, "text/plain", "Invalid request");
+        status_code = 400;
+        root["status"] = "Invalid Request";
     }
+    String json;
+    root.printTo(json);
+    server.send(status_code, "application/json", json);
 }
 
 void LaumioApi::handleApi()
@@ -57,7 +65,14 @@ void LaumioApi::handleApi()
         StaticJsonBuffer < 200 > jsonBuffer;    // Reserve memory space for json
         JsonObject & root = jsonBuffer.parseObject(json);
         if (!root.success()) {
-            server.send(400, "text/plain", "parseObject() failed");
+            StaticJsonBuffer < 200 > jsonBufferResponse;        // Reserve memory space for json
+            JsonObject & response = jsonBufferResponse.createObject();
+            response["hostname"] = WiFi.hostname();
+            response["status"] = "Invalid Request";
+            response["message"] = "Unable to parse JSON";
+            String jsonResponse;
+            response.printTo(jsonResponse);
+            server.send(400, "application/json", jsonResponse);
             return;
         }
         interpretJson(root);
