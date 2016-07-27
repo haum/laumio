@@ -29,7 +29,7 @@ Ring-wise control
 The command is ``0x01`` and one must specify first the ring (``0x00``, ``0x01`` or ``0x02``) and
 then the three bytes of the color::
 
-  0x00 RingID R G B
+  0x01 RingID R G B
 
 Full span control
 *****************
