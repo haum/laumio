@@ -10,21 +10,23 @@ class Laumio:
 
     def fillColor(self, r, g, b):
         payload = bytearray([ 255, r, g, b ])
-        response = self.send(payload)
-        print(response)
+        return self._send(payload)
 
     def setPixelColor(self, pixel, r, g, b):
-        payload = bytearray([ pixel, r, g, b ])
-        response = self.send(payload)
-        print(response)
+        payload = bytearray([ 0, pixel, r, g, b ])
+        return self._send(payload)
 
     def status(self):
         """ Get the JSON Laumio status """
         return urllib.request.urlopen(self.__url).read().decode()
 
+    def _send(self, payload):
+        """ Proxy to socket.socket.sendto w/ minimal error-handling """
+        try:
+            sock = socket.socket(socket.AF_INET, # Internet
+                         socket.SOCK_DGRAM) # UDP
+            sock.sendto(payload, (self.__ip, 6969))
+            return 0
+        except socket.error:
+            return 1
 
-    def send(self, payload):
-        sock = socket.socket(socket.AF_INET, # Internet
-                     socket.SOCK_DGRAM) # UDP
-        sock.sendto(payload, (self.__ip, 6969))
-        return "XXX"
