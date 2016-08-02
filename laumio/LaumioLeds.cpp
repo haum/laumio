@@ -94,7 +94,7 @@ void LaumioLeds::setRingColor(int ring, uint8_t r, uint8_t g, uint8_t b)
 void LaumioLeds::setColumnColor(int column, uint8_t r, uint8_t g, uint8_t b)
 {
     LaumioLeds::Led * pcolumn = nullptr;
-    switch (ring) {
+    switch (column) {
     case 0:
         pcolumn = (LaumioLeds::Led *) & LaumioLeds::AColumn;
         break;
@@ -109,7 +109,7 @@ void LaumioLeds::setColumnColor(int column, uint8_t r, uint8_t g, uint8_t b)
         break;
     }
 
-    if (pring) {
+    if (pcolumn) {
         for (int i = 0; i < 3; i++) {
             strip.setPixelColor(pcolumn[i], r, g, b);
         }
