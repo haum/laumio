@@ -36,6 +36,16 @@ class Laumio:
         payload = bytearray([ 1, ringid, r, g, b ])
         return self._send(payload)
 
+    def fillColumn(self, columnid, r, g, b):
+        """ Set the color of all the leds of column columnid in the Laumio
+        columnid -- Column ID (0~3)
+        r -- red byte
+        g -- green byte
+        b -- blue byte
+        """
+        payload = bytearray([ 2, columnid, r, g, b ])
+        return self._send(payload)
+
     def setPixelColor(self, pixel, r, g, b):
         """ Set the color of all the leds pixel of the Laumio
         pixel -- LED ID (0~12)

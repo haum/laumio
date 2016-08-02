@@ -7,6 +7,7 @@
 enum class Command {
     SetPixel = 0x00,
     SetRing = 0x01,
+    SetColumn = 0x02,
     AnimateRainbow = 0x0a,
     ColorWipe = 0x0b,
     Fill = 0xff

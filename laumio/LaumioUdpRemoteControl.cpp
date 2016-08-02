@@ -28,6 +28,10 @@ void LaumioUdpRemoteControl::interpretUdpMessage(char *buffer)
         leds.setRingColor(buffer[1], buffer[2], buffer[3], buffer[4]);
         break;
 
+    case Command::SetColumn:
+        leds.setColumnColor(buffer[1], buffer[2], buffer[3], buffer[4]);
+        break;
+
     case Command::ColorWipe:
         if (sizeof(buffer)/sizeof(char) > 3) {
           wait = buffer[4];

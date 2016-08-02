@@ -27,6 +27,10 @@ One can use the following boilerplate :
     echo -e "\x01\x$1\x$2\x$3\x$4"
   }
 
+  column() {
+    echo -e "\x02\x$1\x$2\x$3\x$4"
+  }
+
   # Program
   (
   fill 00 00 00

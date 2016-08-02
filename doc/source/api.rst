@@ -33,6 +33,14 @@ then the three bytes of the color::
 
   0x01 RingID R G B
 
+Column-wise control
+*******************
+
+The command is ``0x02`` and one must specify first the column (``0x00``, ``0x01``, ``0x02`` or ``0x03``) and
+then the three bytes of the color::
+
+  0x02 ColumnID R G B
+
 Full span control
 *****************
 

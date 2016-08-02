@@ -25,6 +25,11 @@ page`_.
     Fill a ring with a color. *ringid* can be 0~3 and *r*, *g*, *b* specify the color.
     The top LED is not addressed.
 
+  .. py:method:: fillColumn(colmunid, r, g, b)
+
+    Fill a column with a color. *columnid* can be 0~4 and *r*, *g*, *b* specify the color.
+    The top LED is not addressed.
+
   .. py:method:: setPixelColor(pixel, r, g, b)
 
     Set a pixel *pixel*  (0~12) to a given color (*r*, *g*, *b*).
