@@ -52,19 +52,19 @@ while true; do
 	column 0 ff 00 00
 	sleep $ANIM_TIME
 	column 3 00 00 00
-	sleep $ANIM_TIME
+	sleep $PAUSE_TIME
 	column 1 ff 00 00
 	sleep $ANIM_TIME
 	column 0 00 00 00
-	sleep $ANIM_TIME
+	sleep $PAUSE_TIME
 	column 2 ff 00 00
 	sleep $ANIM_TIME
 	column 1 00 00 00
-	sleep $ANIM_TIME
+	sleep $PAUSE_TIME
 	column 3 ff 00 00
 	sleep $ANIM_TIME
 	column 2 00 00 00
-	sleep $ANIM_TIME
+	sleep $PAUSE_TIME
 
 done
 

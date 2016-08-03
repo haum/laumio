@@ -3,7 +3,7 @@ Laumio's anatomy and HEX commands
 
 The Laumio can be controlled using the bare-UDP API using simple HEX commands sent on the
 **port 6969**. It can alternatively receive commands from a REST API.
-Three different features can be set : the pixel, ring and the whole Laumio at once.
+Four different features can be set : the pixel, ring, column and the whole Laumio at once.
 Additionnaly, some animations can be triggered.
 
 The leds are disposed in 4 branches of three LED plus one at the top. They are numbered
@@ -13,6 +13,8 @@ bottom of the other (with the top middle LED included).
 
 The so-called rings correspond to a layer of LED. There's three of them, numbered from
 bottom to top.
+
+As for the columns, they correspond to the four branches of LEDs, of course without the top LED.
 
 Bare UDP
 --------
