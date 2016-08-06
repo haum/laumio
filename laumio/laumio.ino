@@ -19,9 +19,16 @@
 
 #define NUM_PIXELS 13
 
-
+/* Old versions of Arduino pseudo-IDE need these to compile the code **/
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
+#include <ESP8266WebServer.h>
+#include <ArduinoJson.h>
+#include <DNSServer.h>
+#include <WiFiUdp.h>
+#include <Adafruit_NeoPixel.h>
+#include <EEPROM.h>
+/* Perhaps other later */
 
 #include "LaumioConnect.h"
 #include "LaumioAP.h"
