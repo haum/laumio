@@ -25,7 +25,7 @@ class LaumioUdpRemoteControl {
      WiFiUDP udpServer;
      LaumioLeds & leds;
 
-    void interpretUdpMessage(char *);
+    void interpretUdpMessage(char * buffer, int len);
 };
 
 #endif                          // LAUMIOUDPREMOTECONTROL_H

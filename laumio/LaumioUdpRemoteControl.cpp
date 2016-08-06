@@ -13,42 +13,54 @@ void LaumioUdpRemoteControl::begin()
     MDNS.addService("laumiorc", "udp", 6969);
 }
 
-void LaumioUdpRemoteControl::interpretUdpMessage(char *buffer)
+void LaumioUdpRemoteControl::interpretUdpMessage(char *buffer, int len)
 {
+  while (len > 0) {
+    unsigned int cmdsize = 1;
     Command command = static_cast < Command > (buffer[0]);
-    uint8_t wait = 100;
 
     switch (command) {
 
     case Command::SetPixel:
-        leds.setPixelColor(buffer[1], buffer[2], buffer[3], buffer[4]);
+        cmdsize = 5;
+        if (len >= cmdsize)
+          leds.setPixelColor(buffer[1], buffer[2], buffer[3], buffer[4]);
         break;
 
     case Command::SetRing:
-        leds.setRingColor(buffer[1], buffer[2], buffer[3], buffer[4]);
+        cmdsize = 5;
+        if (len >= cmdsize)
+          leds.setRingColor(buffer[1], buffer[2], buffer[3], buffer[4]);
         break;
 
     case Command::SetColumn:
-        leds.setColumnColor(buffer[1], buffer[2], buffer[3], buffer[4]);
+        cmdsize = 5;
+        if (len >= cmdsize)
+          leds.setColumnColor(buffer[1], buffer[2], buffer[3], buffer[4]);
         break;
 
     case Command::ColorWipe:
-        if (sizeof(buffer)/sizeof(char) > 3) {
-          wait = buffer[4];
-        }
-        leds.colorWipe(buffer[1]<<16 | buffer[2]<<8 | buffer[3], wait);
+        cmdsize = 5;
+        if (len >= cmdsize)
+          leds.colorWipe(buffer[1]<<16 | buffer[2]<<8 | buffer[3], buffer[4]);
         break;
 
     case Command::AnimateRainbow:
+        cmdsize = 1;
         leds.rainbowCycle(1);
         break;
 
     case Command::Fill:
-        leds.fillColor(buffer[1], buffer[2], buffer[3]);
+        cmdsize = 4;
+        if (len >= cmdsize)
+          leds.fillColor(buffer[1], buffer[2], buffer[3]);
         break;
     }
 
-    leds.show();
+    len -= cmdsize;
+    buffer += cmdsize;
+  }
+  leds.show();
 }
 
 void LaumioUdpRemoteControl::handleMessage()
@@ -58,9 +70,7 @@ void LaumioUdpRemoteControl::handleMessage()
     int packetSize = udpServer.parsePacket();
     if (packetSize) {
         int len = udpServer.read(buffer, 255);
-        if (len > 0) {
-            buffer[len] = '\0';
-            interpretUdpMessage(buffer);
-        }
+        if (len > 0)
+            interpretUdpMessage(buffer, len);
     }
 }
