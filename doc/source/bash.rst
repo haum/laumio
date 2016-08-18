@@ -43,5 +43,8 @@ One can use the following boilerplate :
   done
   ) | socat - udp-sendto:$IP:6969
 
+You can also send various commands in one request as in the following example:
+echo -en "\xff\xFF\x00\x00\x00\x09\xff\xff\xff" | socat - udp-sendto:$IP:6969
 
+In this command, the laumio is entirely red colored; then the top led is set to white color. 
 .. _socat: http://www.dest-unreach.org/socat/
