@@ -16,19 +16,19 @@ One can use the following boilerplate :
 
   # Utils
   fill() {
-    echo -e "\xff\x$1\x$2\x$3"
+    echo -en "\xff\x$1\x$2\x$3"
   }
 
   led() {
-    echo -e "\x00\x$1\x$2\x$3\x$4"
+    echo -en "\x00\x$1\x$2\x$3\x$4"
   }
 
   ring() {
-    echo -e "\x01\x$1\x$2\x$3\x$4"
+    echo -en "\x01\x$1\x$2\x$3\x$4"
   }
 
   column() {
-    echo -e "\x02\x$1\x$2\x$3\x$4"
+    echo -en "\x02\x$1\x$2\x$3\x$4"
   }
 
   # Program
