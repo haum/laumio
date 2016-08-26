@@ -26,7 +26,7 @@
 #include <ArduinoJson.h>
 #include <DNSServer.h>
 #include <WiFiUdp.h>
-#include <Adafruit_NeoPixel.h>
+//#include <Adafruit_NeoPixel.h>
 #include <EEPROM.h>
 /* Perhaps other later */
 

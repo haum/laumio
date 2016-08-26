@@ -52,20 +52,20 @@ LaumioLeds::LaumioLeds(uint16_t n, uint8_t p)
 
 void LaumioLeds::begin()
 {
-    strip.begin();
-    strip.show();
+    strip.Begin();
+    strip.Show();
 }
 
 int LaumioLeds::count()
 {
-    return strip.numPixels();
+    return strip.PixelCount();
 }
 
 void LaumioLeds::setPixelColor(const int led, const uint8_t & r,
                                const uint8_t & g, const uint8_t & b)
 {
-    if (led < strip.numPixels()) {
-        strip.setPixelColor(led, r, g, b);
+    if (led < strip.PixelCount()) {
+        strip.SetPixelColor(led, RgbColor(r, g, b));
     }
 }
 
@@ -86,7 +86,7 @@ void LaumioLeds::setRingColor(int ring, uint8_t r, uint8_t g, uint8_t b)
 
     if (pring) {
         for (int i = 0; i < 4; i++) {
-            strip.setPixelColor(pring[i], r, g, b);
+            strip.SetPixelColor(pring[i], RgbColor(r, g, b));
         }
     }
 }
@@ -111,7 +111,7 @@ void LaumioLeds::setColumnColor(int column, uint8_t r, uint8_t g, uint8_t b)
 
     if (pcolumn) {
         for (int i = 0; i < 3; i++) {
-            strip.setPixelColor(pcolumn[i], r, g, b);
+            strip.SetPixelColor(pcolumn[i], RgbColor(r, g, b));
         }
     }
 }
@@ -119,29 +119,29 @@ void LaumioLeds::setColumnColor(int column, uint8_t r, uint8_t g, uint8_t b)
 void LaumioLeds::fillColor(const uint8_t & r,
                            const uint8_t & g, const uint8_t & b)
 {
-    for (uint16_t i = 0; i < strip.numPixels(); i++) {
-        strip.setPixelColor(i, r, g, b);
+    for (uint16_t i = 0; i < strip.PixelCount(); i++) {
+        strip.SetPixelColor(i, RgbColor(r, g, b));
     }
 }
 
 void LaumioLeds::show()
 {
-    strip.show();
+    strip.Show();
 }
 
 void LaumioLeds::animate(Animation a)
 {
     switch (a) {
     case Animation::Clear:
-        colorWipe(strip.Color(0, 0, 0), 50);
+        colorWipe(RgbColor(0, 0, 0), 50);
         break;
     case Animation::Hello:
-        colorWipe(strip.Color(255, 0, 255), 50);
-        colorWipe(strip.Color(0, 0, 0), 50);
+        colorWipe(RgbColor(255, 0, 255), 50);
+        colorWipe(RgbColor(0, 0, 0), 50);
         break;
     case Animation::Loading:
-        colorWipe(strip.Color(255, 0, 0), 50);
-        colorWipe(strip.Color(0, 0, 0), 50);
+        colorWipe(RgbColor(255, 0, 0), 50);
+        colorWipe(RgbColor(0, 0, 0), 50);
         break;
     case Animation::Happy:
         rainbowCycle(1);
@@ -150,12 +150,12 @@ void LaumioLeds::animate(Animation a)
 }
 
 // Fill the dots one after the other with a color
-void LaumioLeds::colorWipe(uint32_t c, uint8_t wait)
+void LaumioLeds::colorWipe(RgbColor c, uint8_t wait)
 {
     uint16_t i;
-    for (i = 0; i < strip.numPixels(); i++) {
-        strip.setPixelColor(i, c);
-        strip.show();
+    for (i = 0; i < strip.PixelCount(); i++) {
+        strip.SetPixelColor(i, c);
+        strip.Show();
         delay(wait);
     }
 }
@@ -165,28 +165,28 @@ void LaumioLeds::rainbowCycle(uint8_t wait)
 {
     uint16_t i, j;
     for (j = 0; j < 256 * 5; j++) {     // 5 cycles of all colors on wheel
-        for (i = 0; i < strip.numPixels(); i++) {
-            strip.setPixelColor(i,
+        for (i = 0; i < strip.PixelCount(); i++) {
+            strip.SetPixelColor(i,
                                 Wheel(((i * 256 /
-                                        strip.numPixels()) + j) & 255));
+                                        strip.PixelCount()) + j) & 255));
         }
-        strip.show();
+        strip.Show();
         delay(wait);
     }
 }
 
 // Input a value 0 to 255 to get a color value.
 // The colours are a transition r - g - b - back to r.
-uint32_t LaumioLeds::Wheel(byte WheelPos)
+RgbColor LaumioLeds::Wheel(byte WheelPos)
 {
     WheelPos = 255 - WheelPos;
     if (WheelPos < 85) {
-        return strip.Color(255 - WheelPos * 3, 0, WheelPos * 3);
+        return RgbColor(255 - WheelPos * 3, 0, WheelPos * 3);
     }
     if (WheelPos < 170) {
         WheelPos -= 85;
-        return strip.Color(0, WheelPos * 3, 255 - WheelPos * 3);
+        return RgbColor(0, WheelPos * 3, 255 - WheelPos * 3);
     }
     WheelPos -= 170;
-    return strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
+    return RgbColor(WheelPos * 3, 255 - WheelPos * 3, 0);
 }

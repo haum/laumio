@@ -1,7 +1,8 @@
 #ifndef LAUMIOLEDS_H
 #define LAUMIOLEDS_H
 
-#include <Adafruit_NeoPixel.h>
+#include <NeoPixelBus.h>
+#include <NeoPixelAnimator.h>
 
 
 class LaumioLeds {
@@ -58,13 +59,12 @@ class LaumioLeds {
     void setColumnColor(int column, uint8_t r, uint8_t g, uint8_t b);
     void show();
 
-    void colorWipe(uint32_t c, uint8_t wait);
+    void colorWipe(RgbColor, uint8_t wait);
     void rainbowCycle(uint8_t wait);
-    uint32_t Wheel(byte WheelPos);
+    RgbColor Wheel(byte WheelPos);
 
   private:
-
-     Adafruit_NeoPixel strip;
+    NeoPixelBus<NeoGrbFeature, NeoEsp8266Uart800KbpsMethod> strip;
 };
 
 #endif                          // LAUMIOLEDS_H
