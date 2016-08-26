@@ -64,7 +64,7 @@ class LaumioLeds {
     RgbColor Wheel(byte WheelPos);
 
   private:
-    NeoPixelBus<NeoGrbFeature, NeoEsp8266Uart800KbpsMethod> strip;
+    NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip;
 };
 
 #endif                          // LAUMIOLEDS_H
