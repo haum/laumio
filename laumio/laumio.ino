@@ -93,7 +93,8 @@ void loop()
             break;
         case wifi_sta_abort:
             leds.colorWipe(0xff3c00, 100);
-            ap.begin(hostString, AP_PASS);
+            delay(3000);
+            ESP.restart();
             break;
         }
     }
