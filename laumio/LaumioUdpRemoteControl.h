@@ -4,6 +4,15 @@
 #include "LaumioLeds.h"
 #include <WiFiUdp.h>
 
+enum class Command {
+    SetPixel = 0x00,
+    SetRing = 0x01,
+    SetColumn = 0x02,
+    AnimateRainbow = 0x0a,
+    ColorWipe = 0x0b,
+    Fill = 0xff
+};
+
 class LaumioUdpRemoteControl {
   public:
 
@@ -16,7 +25,7 @@ class LaumioUdpRemoteControl {
      WiFiUDP udpServer;
      LaumioLeds & leds;
 
-    void interpretUdpMessage(char *);
+    void interpretUdpMessage(char * buffer, int len);
 };
 
 #endif                          // LAUMIOUDPREMOTECONTROL_H
