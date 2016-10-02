@@ -45,7 +45,7 @@ One can use the following boilerplate :
 
 You can also send various commands in one request as in the following example:
 
-.. code-block:: 
+.. code-block::bash
 
   echo -en "\xff\xFF\x00\x00\x00\x09\xff\xff\xff" | socat - udp-sendto:$IP:6969
 

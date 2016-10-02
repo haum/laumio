@@ -45,7 +45,7 @@ Nous vous proposons le code suivant en guise d'exemple et de base de travail :
 
 En outre, il est également possible d'envoyer plusieurs commandes en une seule requête, comme dans l'exemple suivant:
 
-.. code-block:: 
+.. code-block::bash
 
   echo -en "\xff\xFF\x00\x00\x00\x09\xff\xff\xff" | socat - udp-sendto:$IP:6969
 
