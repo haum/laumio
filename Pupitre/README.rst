@@ -31,7 +31,7 @@ When launching the first script, Laumios are place randomly and without IP on th
 
 To launch this script, type this command in the terminal:
 
-.. code-block: bash
+.. code-block:: bash
 
   python control_pupitre.py
 
