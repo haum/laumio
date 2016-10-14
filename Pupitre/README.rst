@@ -45,7 +45,7 @@ An infinite loop is launched, asking you for configurations to set.
  
 For the lazy ones, configuration files can be used. For instance, the following one sets the second Laumio in the center of the virtuel map and forces him to green color.
 
-.. code-block: bash
+.. code-block:: bash
   1
   1
   0.5
@@ -59,6 +59,6 @@ For the lazy ones, configuration files can be used. For instance, the following 
 
 To send this file, just type the following command in your terminal:
 
-.. code-block: bash
+.. code-block:: bash
 
   python control_pupitre.py < <your configuration file>
