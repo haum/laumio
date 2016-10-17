@@ -16,7 +16,7 @@ You need Python 2, opencv for python and a webcam.
 
 To launch the script, just type the following line in a terminal:
 
-.. code-block: bash
+.. code-block:: bash
 
   python pupitre.py <webcam id>
 
