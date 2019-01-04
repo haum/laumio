@@ -17,7 +17,7 @@
 //#define DIN_PIN D4
 #define DIN_PIN D3
 
-#define NUM_PIXELS 13
+#define NUM_PIXELS 5
 
 /* Old versions of Arduino pseudo-IDE need these to compile the code **/
 #include <ESP8266WiFi.h>
@@ -36,6 +36,7 @@
 #include "LaumioHttp.h"
 #include "LaumioApi.h"
 #include "LaumioUdpRemoteControl.h"
+#include "LaumioMQTT.h"
 
 LaumioLeds leds(NUM_PIXELS, DIN_PIN);
 LaumioHttp httpServer;
@@ -44,6 +45,8 @@ LaumioUdpRemoteControl udpRC(leds);
 LaumioAP ap(httpServer);
 
 LaumioConnect conn;
+LaumioMQTT mqtt_client(leds, conn);
+
 int connectCounter = 0;
 
 char const *AP_PASS = "";
