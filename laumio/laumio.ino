@@ -45,7 +45,7 @@ LaumioUdpRemoteControl udpRC(leds);
 LaumioAP ap(httpServer);
 
 LaumioConnect conn;
-LaumioMQTT mqtt_client(leds, conn);
+LaumioMQTT mqtt_client(leds);
 
 int connectCounter = 0;
 
@@ -126,6 +126,7 @@ void loop()
         leds.animate(LaumioLeds::Animation::Happy);
         udpRC.begin();
         MDNS.begin(hostString);
+        mqtt_client.begin();
         laumio_state = ready;
         break;
     case wifi_sta_abort:
@@ -134,6 +135,7 @@ void loop()
     case ready:
         httpServer.handleClient();
         udpRC.handleMessage();
+        mqtt_client.loop();
         break;
     }
 }
