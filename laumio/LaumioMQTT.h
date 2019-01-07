@@ -20,7 +20,8 @@ class LaumioMQTT {
      PubSubClient client {ethClient};
      LaumioLeds & leds;
 
-
+     char NameString[16] = { 0 };
+     long lastReconnectAttempt = 0;
 };
 
 #endif	/* LAUMIOMQTT_H */

@@ -16,11 +16,41 @@ LaumioMQTT::LaumioMQTT(LaumioLeds & l) : leds(l) {
 void LaumioMQTT::begin() {
   client.setServer(mqtt_server, 1883);
   client.setCallback(mqtt_callback);
-  client.subscribe("laumio/all/#");
+  // client.subscribe("laumio/all/#");
 }
 
 void LaumioMQTT::loop() {
-  client.loop();
+
+
+
+if (!client.connected()) {
+    long now = millis();
+    if (now - lastReconnectAttempt > 5000) {
+      lastReconnectAttempt = now;
+      // Attempt to reconnect
+      Serial.print("Attempting MQTT connection...");
+      if (client.connect(NameString, mqtt_user, mqtt_pass)) {
+        Serial.println("connected")
+        // Once connected, publish an announcement...
+        client.publish("laumio/status/","hello world");
+        // ... and resubscribe
+        client.subscribe("laumio/all/");
+      } else {
+        Serial.print("failed, rc=");
+        Serial.println(client.state());
+      }
+
+      if (client.connected()) {
+        Serial.println("MQTT Connected");
+        lastReconnectAttempt = 0;
+      }
+    }
+  } else {
+    // Client connected
+
+    client.loop();
+  }
+
 }
 
 void LaumioMQTT::callback(char* topic, byte* payload, unsigned int len) {

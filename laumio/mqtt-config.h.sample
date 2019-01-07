@@ -1,1 +1,3 @@
 const char* mqtt_server = "broker.mqtt-dashboard.com";
+const char* mqtt_user = "";
+const char* mqtt_pass = "";
