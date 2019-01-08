@@ -100,6 +100,11 @@ void LaumioMQTT::callback(char* topic, byte* payload, unsigned int len) {
   } else if (!strcmp("fill", cmd)) {
     if (len >= 3)
       leds.fillColor(payload[0], payload[1], payload[2]);
+  } else if (!strcmp("json", cmd)) {
+    char payload_cstr[len+1];
+    memcpy(payload_cstr, payload, len);
+    payload_cstr[len+1] = 0;
+    leds.jsonCommands(payload_cstr);
   } else if (!strcmp("discover", cmd)) {
     client.publish("laumio/status/advertise", NameString);
   } else {
