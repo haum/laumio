@@ -64,9 +64,9 @@ void LaumioMQTT::callback(char* topic, byte* payload, unsigned int len) {
   Serial.println();
   // Extract command from topic name
   char * cmd = "";
-  if (!strcmp(topic, "laumio/all/")) {
+  if (strcmp(topic, "laumio/all/")) {
     cmd = topic + 11;
-    Serial.println(cmd);
+    // Serial.printf("Cmd : %s\n\r", cmd);
   }
 
   // Execute command
@@ -74,9 +74,12 @@ void LaumioMQTT::callback(char* topic, byte* payload, unsigned int len) {
     // No command, or not for me, ignore
   } else if (!strcmp("set_pixel", cmd)) {
     if (len >= 4)
+      Serial.println("Set_Pixel");
+      Serial.printf("len : %d\n\r", len);
       leds.setPixelColor(payload[0], payload[1], payload[2], payload[3]);
   } else if (!strcmp("set_ring", cmd)) {
     if (len >= 4)
+    Serial.println("Set_Ring");
       leds.setRingColor(payload[0], payload[1], payload[2], payload[3]);
   } else if (!strcmp("set_column", cmd)) {
     if (len >= 4)
