@@ -1,16 +1,26 @@
 Anatomie du Laumio's et and commandes en valeurs hexadécimales
 ==============================================================
 
-Le laumio peut être commandé via une API UDP minimale utilisant des commandes simples en hexadécimal envoyées sur le
-**port 6969**. Celui-ci peut également recevoir via des commandes d'une API REST.
-Quatre types de sous-ensembles sont utilisables pour commander les LEDs du Laumio  : le pixel (une seule led), l'anneau, la colonne et le Laumio dans son intégralité.
-Il est aussi possible de lancer quelques animations plus spécifiques.
+Le laumio peut être commandé via une API UDP minimale utilisant des commandes
+simples en hexadécimal envoyées sur le **port 6969**, via une interface REST ou
+à travers MQTT.
 
-Les LEDs sont disposées en 4 branches de trois LEDs, en plus d'une à son sommet. Celles-ci sont toutes numérotées de 0 à 12 depuis le bas d'une des branches vers sa cîme, évitant l'unique led du sommet, descendant ensuite de l'autre côté de la structure, et enfin remontant du bas d'une des deux branches restantes pour atteindre le bas de la dernière (la LED de sommet étant cette fois-ci reliée entre les deux branches).
+Quatre types de sous-ensembles sont utilisables pour commander les LEDs du
+Laumio : le pixel (une seule led), l'anneau, la colonne et le Laumio dans son
+intégralité. Il est aussi possible de lancer quelques animations plus spécifiques.
 
-Les anneaux correspondant quant à eux à une ligne horizontale de LEDs. Il y en a trois numérotées de 0  à 2, de bas en haut.
+Les LEDs sont disposées en 4 branches de trois LEDs, en plus d'une à son sommet.
+Celles-ci sont toutes numérotées de 0 à 12 depuis le bas d'une des branches vers
+sa cîme, évitant l'unique led du sommet, descendant ensuite de l'autre côté de
+la structure, et enfin remontant du bas d'une des deux branches restantes pour
+atteindre le bas de la dernière (la LED de sommet étant cette fois-ci reliée
+entre les deux branches).
 
-Enfin, dans le cas des colonnes, celles-ci se rapportent aux quatre branches de LEDs, bien entendu sans la LED du sommet.
+Les anneaux correspondant quant à eux à une ligne horizontale de LEDs. Il y en a
+trois numérotées de 0  à 2, de bas en haut.
+
+Enfin, dans le cas des colonnes, celles-ci se rapportent aux quatre branches de
+LEDs, bien entendu sans la LED du sommet.
 
 API UDP minimale
 ----------------
@@ -63,29 +73,225 @@ L'animation Arc-en-ciel ("rainbow") ne prend pas de paramètres. En l'occurence,
   0x0a
 
 
-API JSON
+API REST
 --------
 
-L'API JSON est toujours en développement et toutes les requêtes UDP actuellement possibles n'ont pas encore été réimplémentées .
+L'API REST peut être appelée en envoyant des données sur le chemin ``/api/``.
 
 Statut
 ******
 
 Le statut du Laumio peut être obtenu en utilisant un endpoint de l'``/api/``::
 
-  GET http://<laumio's ip>/api/
+  GET http://<laumio_ip>/api/
 
 La réponse reçue et de la forme suivante :
 
 .. code-block:: javascript
 
-  {"name":"laumio","version":"devel"}
+  {"hostname":"laumio","version":"devel"}
 
-Commande pixel par pixel
-************************
+Commandes
+*********
 
-Le Laumio est contrôlable vie de simples requêtes POST, précisant à la fois les clefs ``led`` et
-``rgb`` :
+Le Laumio peut être controllé à travers un simple requête POST avec une donnée
+JSON jointe. Voir l'API JSON pour les détails du contenu de ces JSON.
+
+En cas de succès :
+
+.. code-block:: javascript
+
+  {"hostname":"laumio","status":"Success"}
+
+En cas d'erreur :
+
+.. code-block:: javascript
+
+  {"hostname":"laumio","status":"Invalid Request","massage":"Unable to parse JSON"}
+
+
+API MQTT
+--------
+
+Si le Laumio a pu se connecter au broker, il peut être contrôlé à travers MQTT.
+
+Annonce
+*******
+
+À la connecion, il publie son nom sur le topic ``laumio/status/advertise``.
+
+Ce même message est envoyé quand il reçoit une commande ``discover``.
+
+Commandes
+*********
+
+La commande est choisie en fonction du topic : ``laumio/all/<cmd>`` ou ``laumio/<name>/<cmd>``
+selon que vous voulez l'envoyer à tous les clients connectés ou à un en particulier.
+
+set_pixel
+~~~~~~~~~
+
+Change la couleur d'une led.
+
+Les 4 octets du message sont le numéro de la led suivi des composantes rouge, vert, bleu de la couleur (0 à 255)
+
+set_ring
+~~~~~~~~~
+
+Change la couleur d'un anneau.
+
+Les 4 octets du message sont le numéro de l'anneau suivi des composantes rouge, vert, bleu de la couleur (0 à 255)
+
+set_column
+~~~~~~~~~~
+
+Change la couleur d'une colonne.
+
+Les 4 octets du message sont le numéro de la colonne suivi des composantes rouge, vert, bleu de la couleur (0 à 255)
+
+color_wipe
+~~~~~~~~~~
+
+Démarre l'animation de remplissage progressif avec une couleur et une durée.
+
+Les 4 octets du message sont les composantes rouge, vert, bleu de la couleur (0 à 255) suivies de la durée.
+
+animate_rainbow
+~~~~~~~~~~~~~~~
+
+Démarre l'animation arc-en-ciel.
+
+Le contenu du message est ignoré.
+
+fill
+~~~~
+
+Change la couleur de toutes les leds.
+
+Les 3 octets du message sont les composantes rouge, vert, bleu de la couleur (0 à 255)
+
+json
+~~~~
+
+Envoie des commandes JSON via l'API JSON.
+
+discover
+~~~~~~~~
+
+Renvoie un message sur le topic ``laumio/status/advertise`` contenant son nom.
+
+
+API JSON
+--------
+
+Cette API ne peut pas être utilisée seule. Elle est accédée soit par la commande
+``json`` de l'interface MQTT ou par l'API REST.
+
+Commandes
+*********
+
+set_pixel
+~~~~~~~~~
+
+Change la couleur d'une led.
+
+.. code-block:: javascript
+
+  {
+    'command': 'set_pixel',
+    'led': PixelID,
+    'rgb': [R, G, B]
+  }
+
+set_ring
+~~~~~~~~~
+
+Change la couleur d'un anneau.
+
+.. code-block:: javascript
+
+  {
+    'command': 'set_ring',
+    'ring': RingID,
+    'rgb': [R, G, B]
+  }
+
+set_column
+~~~~~~~~~~
+
+Change la couleur d'une colonne.
+
+.. code-block:: javascript
+
+  {
+    'command': 'set_column',
+    'column': ColumnID,
+    'rgb': [R, G, B]
+  }
+
+color_wipe
+~~~~~~~~~~
+
+Démarre l'animation de remplissage progressif avec une couleur et une durée.
+
+.. code-block:: javascript
+
+  {
+    'command': 'color_wipe',
+    'duration': Duration,
+    'rgb': [R, G, B]
+  }
+
+animate_rainbow
+~~~~~~~~~~~~~~~
+
+Démarre l'animation arc-en-ciel.
+
+.. code-block:: javascript
+
+  {
+    'command': 'animate_rainbow',
+  }
+
+fill
+~~~~
+
+Change la couleur de toutes les leds.
+
+.. code-block:: javascript
+
+  {
+    'command': 'fill',
+    'rgb': [R, G, B]
+  }
+
+Commandes multiples
+*******************
+
+Quelques commandes peuvent être chaînées dans un même appel lorsqu'elles
+sont regroupées dans un tableau nommé ``commands``, mais notez que la
+taille du JSON est quelque peu limitée.
+
+.. code-block:: javascript
+
+  {
+    'commands': [
+      {
+        'command': 'set_column',
+        'column': 0,
+        'rgb': [255, 0, 0]
+      },
+      {
+        'command': 'set_column',
+        'column': 2,
+        'rgb': [0, 0, 255]
+      }
+    ]
+  }
+
+
+Commande pixel par pixel (ancienne API)
+***************************************
 
 .. code-block:: javascript
 
@@ -94,10 +300,8 @@ Le Laumio est contrôlable vie de simples requêtes POST, précisant à la fois 
     'rgb': [R, G, B]
   }
 
-Remplissage intégral
-********************
-
-Pour commande toutes les LEDs du Laumio en une seule fois, il suffit de passer le paramètre ``led`` à la valeur 255 dans la bribe de JSON précédente:
+Remplissage intégral (ancienne API)
+***********************************
 
 .. code-block:: javascript
 
@@ -105,3 +309,4 @@ Pour commande toutes les LEDs du Laumio en une seule fois, il suffit de passer l
     'led': 255,
     'rgb': [R, G, B]
   }
+
