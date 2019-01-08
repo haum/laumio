@@ -17,7 +17,6 @@ void LaumioMQTT::begin() {
   client.setServer(mqtt_server, 1883);
   client.setCallback(mqtt_callback);
   sprintf(NameString, "Laumio_%06X", ESP.getChipId());
-  // client.subscribe("laumio/all/#");
 }
 
 void LaumioMQTT::loop() {
@@ -36,6 +35,9 @@ if (!client.connected()) {
         client.publish("laumio/status/","connected");
         // ... and resubscribe
         client.subscribe("laumio/all/#");
+        char myTopicsWildcard[10+13];
+        sprintf(myTopicsWildcard, "laumio/%13s/#", NameString);
+        client.subscribe(myTopicsWildcard);
       } else {
         Serial.print("failed, rc=");
         Serial.println(client.state());
@@ -67,6 +69,12 @@ void LaumioMQTT::callback(char* topic, byte* payload, unsigned int len) {
   if (strcmp(topic, "laumio/all/")) {
     cmd = topic + 11;
     // Serial.printf("Cmd : %s\n\r", cmd);
+  } else {
+    char myTopicsStartWith[9+13];
+    sprintf(myTopicsStartWith, "laumio/%13s/", NameString);
+    if (!strcmp(topic, myTopicsStartWith)) {
+      cmd = topic + 8 + 13;
+    }
   }
 
   // Execute command
