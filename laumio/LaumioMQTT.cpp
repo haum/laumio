@@ -100,6 +100,8 @@ void LaumioMQTT::callback(char* topic, byte* payload, unsigned int len) {
   } else if (!strcmp("fill", cmd)) {
     if (len >= 3)
       leds.fillColor(payload[0], payload[1], payload[2]);
+  } else if (!strcmp("discover", cmd) {
+    client.publish("laumio/status/advertise", NameString);
   } else {
     Serial.print("Command not found: ");
     Serial.println(cmd);
