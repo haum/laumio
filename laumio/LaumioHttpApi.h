@@ -19,8 +19,6 @@ class LaumioHttpApi {
      LaumioLeds & leds;
 
     void handleApi();
-    void sendStatus();
-    void interpretJson(JsonObject & jo);
 };
 
 #endif                          // LAUMIOAPI_H
