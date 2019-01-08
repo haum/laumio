@@ -190,3 +190,63 @@ uint32_t LaumioLeds::Wheel(byte WheelPos)
     WheelPos -= 170;
     return strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
 }
+
+bool LaumioLeds::jsonCommands(const char * str) {
+    StaticJsonBuffer <800> jsonBuffer; // Reserve memory space for json
+    JsonObject & obj = jsonBuffer.parseObject(str);
+    return obj.success() && jsonCommands(obj);
+}
+
+bool LaumioLeds::jsonCommands(JsonObject & jo) {
+    if (jo.containsKey("commands")) {
+        if (!jo["commands"].is<JsonArray>())
+            return false;
+        bool ok = true;
+        for (auto var : jo["commands"].as<JsonArray>())
+            ok &= jsonCommands(var.as<JsonObject>());
+        return ok;
+
+    } else if (jo.containsKey("command")) { // New api
+        const auto & cmd = jo["command"];
+
+        const int r = jo["rgb"][0];
+        const int g = jo["rgb"][1];
+        const int b = jo["rgb"][2];
+
+        if (cmd == "set_pixel") {
+            setPixelColor(jo["led"], r, g, b);
+            return true;
+        } else if (cmd == "set_ring") {
+            setRingColor(jo["ring"], r, g, b);
+            return true;
+        } else if (cmd == "set_column") {
+            setColumnColor(jo["column"], r, g, b);
+            return true;
+        } else if (cmd == "color_wipe") {
+            colorWipe(strip.Color(r, g, b), jo["duration"]);
+            return true;
+        } else if (cmd == "animate_rainbow") {
+            rainbowCycle(1);
+            return true;
+        } else if (cmd == "fill") {
+            fillColor(r, g, b);
+            return true;
+        }
+
+    } else if (jo.containsKey("rgb")) { // Legacy api
+        const int led = jo["led"];
+        const int r = jo["rgb"][0];
+        const int g = jo["rgb"][1];
+        const int b = jo["rgb"][2];
+
+        // if led = 255 set all LEDs to rgb value
+        if (led == 255) {
+            fillColor(r, g, b);
+        } else {
+            setPixelColor(led, r, g, b);
+        }
+        show();
+        return true;
+    }
+    return false;
+}
