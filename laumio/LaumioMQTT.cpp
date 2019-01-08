@@ -20,27 +20,29 @@ void LaumioMQTT::begin() {
 }
 
 void LaumioMQTT::loop() {
-
-
-
-if (!client.connected()) {
+  if (!client.connected()) {
     long now = millis();
     if (now - lastReconnectAttempt > 5000) {
       lastReconnectAttempt = now;
+
       // Attempt to reconnect
       Serial.print("Attempting MQTT connection...");
       if (client.connect(NameString, mqtt_user, mqtt_pass)) {
-        Serial.println("connected");
+        Serial.println(" connected.");
+
         // Once connected, publish an announcement...
         client.publish("laumio/status/","connected");
+
         // ... and resubscribe
         client.subscribe("laumio/all/#");
         char myTopicsWildcard[10+13];
         sprintf(myTopicsWildcard, "laumio/%13s/#", NameString);
         client.subscribe(myTopicsWildcard);
+
       } else {
-        Serial.print("failed, rc=");
-        Serial.println(client.state());
+        Serial.print(" failed. (state=");
+        Serial.print(client.state());
+        Serial.println(")");
       }
 
       if (client.connected()) {
@@ -48,27 +50,28 @@ if (!client.connected()) {
         lastReconnectAttempt = 0;
       }
     }
+
   } else {
     // Client connected
-
     client.loop();
   }
-
 }
 
 void LaumioMQTT::callback(char* topic, byte* payload, unsigned int len) {
   // Display topic and payload
+  Serial.print("[MQTT topic] ");
   Serial.print(topic);
   Serial.print(" : ");
   for (int i = 0; i < len; i++) {
-    Serial.print((char)payload[i]);
+    Serial.print((char)payload[i], HEX);
+    Serial.print(' ');
   }
   Serial.println();
+  
   // Extract command from topic name
   char * cmd = "";
   if (strcmp(topic, "laumio/all/")) {
     cmd = topic + 11;
-    // Serial.printf("Cmd : %s\n\r", cmd);
   } else {
     char myTopicsStartWith[9+13];
     sprintf(myTopicsStartWith, "laumio/%13s/", NameString);
@@ -82,12 +85,9 @@ void LaumioMQTT::callback(char* topic, byte* payload, unsigned int len) {
     // No command, or not for me, ignore
   } else if (!strcmp("set_pixel", cmd)) {
     if (len >= 4)
-      Serial.println("Set_Pixel");
-      Serial.printf("len : %d\n\r", len);
       leds.setPixelColor(payload[0], payload[1], payload[2], payload[3]);
   } else if (!strcmp("set_ring", cmd)) {
     if (len >= 4)
-    Serial.println("Set_Ring");
       leds.setRingColor(payload[0], payload[1], payload[2], payload[3]);
   } else if (!strcmp("set_column", cmd)) {
     if (len >= 4)
@@ -100,5 +100,8 @@ void LaumioMQTT::callback(char* topic, byte* payload, unsigned int len) {
   } else if (!strcmp("fill", cmd)) {
     if (len >= 3)
       leds.fillColor(payload[0], payload[1], payload[2]);
+  } else {
+    Serial.print("Command not found: ");
+    Serial.println(cmd);
   }
 }
