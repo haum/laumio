@@ -30,7 +30,7 @@ void LaumioHttpApi::handleApi()
         }
 
         if (success) {
-            answer["name"] = WiFi.hostname();
+            answer["hostname"] = WiFi.hostname();
             answer["status"] = "Success";
 
         } else {
