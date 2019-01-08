@@ -16,6 +16,7 @@ LaumioMQTT::LaumioMQTT(LaumioLeds & l) : leds(l) {
 void LaumioMQTT::begin() {
   client.setServer(mqtt_server, 1883);
   client.setCallback(mqtt_callback);
+  sprintf(NameString, "Laumio_%06X", ESP.getChipId());
   // client.subscribe("laumio/all/#");
 }
 
@@ -30,11 +31,11 @@ if (!client.connected()) {
       // Attempt to reconnect
       Serial.print("Attempting MQTT connection...");
       if (client.connect(NameString, mqtt_user, mqtt_pass)) {
-        Serial.println("connected")
+        Serial.println("connected");
         // Once connected, publish an announcement...
-        client.publish("laumio/status/","hello world");
+        client.publish("laumio/status/","connected");
         // ... and resubscribe
-        client.subscribe("laumio/all/");
+        client.subscribe("laumio/all/#");
       } else {
         Serial.print("failed, rc=");
         Serial.println(client.state());
@@ -54,10 +55,18 @@ if (!client.connected()) {
 }
 
 void LaumioMQTT::callback(char* topic, byte* payload, unsigned int len) {
+  // Display topic and payload
+  Serial.print(topic);
+  Serial.print(" : ");
+  for (int i = 0; i < len; i++) {
+    Serial.print((char)payload[i]);
+  }
+  Serial.println();
   // Extract command from topic name
   char * cmd = "";
   if (!strcmp(topic, "laumio/all/")) {
     cmd = topic + 11;
+    Serial.println(cmd);
   }
 
   // Execute command

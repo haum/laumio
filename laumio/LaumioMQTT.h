@@ -5,7 +5,7 @@
 #include "LaumioLeds.h"
 #include "LaumioConnect.h"
 
-#include <Ethernet.h>
+// #include <Ethernet.h>
 #include <PubSubClient.h>
 
 class LaumioMQTT {
@@ -16,7 +16,7 @@ class LaumioMQTT {
     void callback(char* topic, byte* payload, unsigned int length);
 
   private:
-     EthernetClient ethClient;
+     WiFiClient ethClient;
      PubSubClient client {ethClient};
      LaumioLeds & leds;
 
