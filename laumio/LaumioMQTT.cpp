@@ -70,12 +70,12 @@ void LaumioMQTT::callback(char* topic, byte* payload, unsigned int len) {
   
   // Extract command from topic name
   char * cmd = "";
-  if (strcmp(topic, "laumio/all/")) {
+  if (!strncmp(topic, "laumio/all/", 11)) {
     cmd = topic + 11;
   } else {
     char myTopicsStartWith[9+13];
     sprintf(myTopicsStartWith, "laumio/%13s/", NameString);
-    if (!strcmp(topic, myTopicsStartWith)) {
+    if (!strncmp(topic, myTopicsStartWith, 8 + 13)) {
       cmd = topic + 8 + 13;
     }
   }
