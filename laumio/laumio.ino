@@ -35,13 +35,13 @@
 #include "LaumioAP.h"
 #include "LaumioLeds.h"
 #include "LaumioHttp.h"
-#include "LaumioApi.h"
+#include "LaumioHttpApi.h"
 #include "LaumioUdpRemoteControl.h"
 #include "LaumioMQTT.h"
 
 LaumioLeds leds(NUM_PIXELS, DIN_PIN);
 LaumioHttp httpServer;
-LaumioApi api(leds, httpServer);
+LaumioHttpApi api(leds, httpServer);
 LaumioUdpRemoteControl udpRC(leds);
 LaumioAP ap(httpServer);
 

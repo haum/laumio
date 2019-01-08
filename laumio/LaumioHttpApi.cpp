@@ -1,17 +1,17 @@
-#include "LaumioApi.h"
+#include "LaumioHttpApi.h"
 
-LaumioApi::LaumioApi(LaumioLeds & l, LaumioHttp & s)
+LaumioHttpApi::LaumioHttpApi(LaumioLeds & l, LaumioHttp & s)
 :  server(s.server), leds(l)
 {
 }
 
-void LaumioApi::begin()
+void LaumioHttpApi::begin()
 {
-    server.on("/api/", std::bind(&LaumioApi::handleApi, this));
-    server.on("/api", std::bind(&LaumioApi::handleApi, this));
+    server.on("/api/", std::bind(&LaumioHttpApi::handleApi, this));
+    server.on("/api", std::bind(&LaumioHttpApi::handleApi, this));
 }
 
-void LaumioApi::sendStatus()
+void LaumioHttpApi::sendStatus()
 {
     StaticJsonBuffer < 200 > jsonBuffer;        // Reserve memory space for json
     JsonObject & root = jsonBuffer.createObject();
@@ -22,7 +22,7 @@ void LaumioApi::sendStatus()
     server.send(200, "application/json", json);
 }
 
-void LaumioApi::interpretJson(JsonObject & jo)
+void LaumioHttpApi::interpretJson(JsonObject & jo)
 {
     StaticJsonBuffer < 200 > jsonBuffer;        // Reserve memory space for json
     JsonObject & root = jsonBuffer.createObject();
@@ -51,7 +51,7 @@ void LaumioApi::interpretJson(JsonObject & jo)
     server.send(status_code, "application/json", json);
 }
 
-void LaumioApi::handleApi()
+void LaumioHttpApi::handleApi()
 {
     if (server.method() == HTTP_GET) {
         sendStatus();

@@ -19,7 +19,7 @@ class LaumioHttp {
 
     void handleNotFound();
 
-    friend class LaumioApi;
+    friend class LaumioHttpApi;
     friend class LaumioAP;
 };
 

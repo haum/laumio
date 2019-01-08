@@ -6,10 +6,10 @@
 
 #include <ArduinoJson.h>
 
-class LaumioApi {
+class LaumioHttpApi {
   public:
 
-    LaumioApi(LaumioLeds & l, LaumioHttp & h);
+    LaumioHttpApi(LaumioLeds & l, LaumioHttp & h);
 
     void begin();
 
