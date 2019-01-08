@@ -17,7 +17,7 @@
 //#define DIN_PIN D4
 #define DIN_PIN D3
 
-#define NUM_PIXELS 5
+#define NUM_PIXELS 13
 
 /* Old versions of Arduino pseudo-IDE need these to compile the code **/
 #include <ESP8266WiFi.h>
