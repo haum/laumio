@@ -31,7 +31,7 @@ void LaumioMQTT::loop() {
         Serial.println(" connected.");
 
         // Once connected, publish an announcement...
-        client.publish("laumio/status/","connected");
+        client.publish("laumio/status/advertise", NameString);
 
         // ... and resubscribe
         client.subscribe("laumio/all/#");
