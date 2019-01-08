@@ -215,12 +215,15 @@ bool LaumioLeds::jsonCommands(JsonObject & jo) {
 
         if (cmd == "set_pixel") {
             setPixelColor(jo["led"], r, g, b);
+            show();
             return true;
         } else if (cmd == "set_ring") {
             setRingColor(jo["ring"], r, g, b);
+            show();
             return true;
         } else if (cmd == "set_column") {
             setColumnColor(jo["column"], r, g, b);
+            show();
             return true;
         } else if (cmd == "color_wipe") {
             colorWipe(strip.Color(r, g, b), jo["duration"]);
@@ -230,6 +233,7 @@ bool LaumioLeds::jsonCommands(JsonObject & jo) {
             return true;
         } else if (cmd == "fill") {
             fillColor(r, g, b);
+            show();
             return true;
         }
 
