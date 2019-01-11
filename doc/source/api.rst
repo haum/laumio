@@ -115,6 +115,12 @@ MQTT API
 
 If the laumio can connect to your broker, it can be controlled through MQTT.
 
+Online status
+*************
+
+At connection laumio publishes to the topic ``laumio/<Laumio_Name>/status`` is online status,
+if laumio will go offline this topic will send an offline status
+
 Advertise
 *********
 

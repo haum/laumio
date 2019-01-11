@@ -24,13 +24,17 @@ void LaumioMQTT::loop() {
     long now = millis();
     if (now - lastReconnectAttempt > 5000) {
       lastReconnectAttempt = now;
-
       // Attempt to reconnect
       Serial.print("Attempting MQTT connection...");
-      if (client.connect(NameString, mqtt_user, mqtt_pass)) {
+      char myWillTopics[14+13];
+      sprintf(myWillTopics, "laumio/%13s/status", NameString);
+      // boolean connect (clientID, username, password, willTopic, willQoS, willRetain, willMessage)
+      if (client.connect(NameString, mqtt_user, mqtt_pass, myWillTopics, 0, 1, "offline" )) {
         Serial.println(" connected.");
 
         // Once connected, publish an announcement...
+        client.publish( myWillTopics, "online", true);
+
         client.publish("laumio/status/advertise", NameString);
 
         // ... and resubscribe
@@ -67,7 +71,7 @@ void LaumioMQTT::callback(char* topic, byte* payload, unsigned int len) {
     Serial.print(' ');
   }
   Serial.println();
-  
+
   // Extract command from topic name
   char * cmd = "";
   if (!strncmp(topic, "laumio/all/", 11)) {
