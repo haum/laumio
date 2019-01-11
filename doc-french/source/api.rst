@@ -115,16 +115,16 @@ API MQTT
 
 Si le Laumio a pu se connecter au broker, il peut être contrôlé à travers MQTT.
 
-Status de connection
+Status de connexion
 ********************
 
-A la connecion le laumio publie sur le topic ``laumio/<Laumio_Name>/status`` son status de connecion,
+A la connexion le laumio publie sur le topic ``laumio/<name>/status`` son status de connexion,
 Si le laumio se trouve hors ligne ce topic publiera un status offline
 
 Annonce
 *******
 
-À la connecion, il publie son nom sur le topic ``laumio/status/advertise``.
+À la connexion, il publie son nom sur le topic ``laumio/status/advertise``.
 
 Ce même message est envoyé quand il reçoit une commande ``discover``.
 
