@@ -27,7 +27,7 @@ void LaumioMQTT::loop() {
       // Attempt to reconnect
       Serial.print("Attempting MQTT connection...");
       char myWillTopics[14+13];
-      sprintf(myWillTopics, "laumio/%13s/status", NameString);
+      sprintf(myWillTopics, "laumio/status/%13s", NameString);
       // boolean connect (clientID, username, password, willTopic, willQoS, willRetain, willMessage)
       if (client.connect(NameString, mqtt_user, mqtt_pass, myWillTopics, 0, 1, "offline" )) {
         Serial.println(" connected.");
