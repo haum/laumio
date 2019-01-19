@@ -59,7 +59,7 @@ Color Wipe
 ~~~~~~~~~~
 
 The color wipe animation changes the color on the full Laumio one LED at a time. It takes
-two parameters, the 3 bytes of color and the delay between two LED::
+two parameters, the 3 bytes of color and the delay (ms between each light-up) between two LED::
 
   0x0b R G B Delay
 

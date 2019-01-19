@@ -51,7 +51,7 @@ Les animations prédéfinies sont encore en développement mais deux d'entre ell
 Remplissage progressif
 ~~~~~~~~~~~~~~~~~~~~~~
 
-L'animation de Remplissage progressif ("color wipe") change passe le Laumio intégralement dans une seule couleur, mais LED après LED. Elle prend deux paramètres, que sont les trois octets de la nouvelle couleur et l'intervalle de temps entre de deux LEDs::
+L'animation de Remplissage progressif ("color wipe") change passe le Laumio intégralement dans une seule couleur, mais LED après LED. Elle prend deux paramètres, que sont les trois octets de la nouvelle couleur et l'intervalle de temps entre de deux LEDs en millisecondes::
 
   0x0b R G B Delay
 
