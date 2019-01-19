@@ -88,22 +88,30 @@ void LaumioMQTT::callback(char* topic, byte* payload, unsigned int len) {
   if (!strcmp("", cmd)) {
     // No command, or not for me, ignore
   } else if (!strcmp("set_pixel", cmd)) {
-    if (len >= 4)
+    if (len >= 4) {
       leds.setPixelColor(payload[0], payload[1], payload[2], payload[3]);
+      leds.show();
+    }
   } else if (!strcmp("set_ring", cmd)) {
-    if (len >= 4)
+    if (len >= 4) {
       leds.setRingColor(payload[0], payload[1], payload[2], payload[3]);
+      leds.show();
+    }
   } else if (!strcmp("set_column", cmd)) {
-    if (len >= 4)
+    if (len >= 4) {
       leds.setColumnColor(payload[0], payload[1], payload[2], payload[3]);
+      leds.show();
+    }
   } else if (!strcmp("color_wipe", cmd)) {
     if (len >= 4)
       leds.colorWipe(payload[0]<<16 | payload[1]<<8 | payload[2], payload[3]);
   } else if (!strcmp("animate_rainbow", cmd)) {
     leds.rainbowCycle(1);
   } else if (!strcmp("fill", cmd)) {
-    if (len >= 3)
+    if (len >= 3) {
       leds.fillColor(payload[0], payload[1], payload[2]);
+      leds.show();
+    }
   } else if (!strcmp("json", cmd)) {
     char payload_cstr[len+1];
     memcpy(payload_cstr, payload, len);
