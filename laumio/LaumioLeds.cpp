@@ -209,9 +209,18 @@ bool LaumioLeds::jsonCommands(JsonObject & jo) {
     } else if (jo.containsKey("command")) { // New api
         const auto & cmd = jo["command"];
 
-        const int r = jo["rgb"][0];
-        const int g = jo["rgb"][1];
-        const int b = jo["rgb"][2];
+        int r = jo["rgb"][0];
+        int g = jo["rgb"][1];
+        int b = jo["rgb"][2];
+        if (jo["rgb"].is<const char *>()) {
+            auto colorstr = jo["rgb"].asString();
+            if (colorstr[0] == '#' && strlen(colorstr) == 7) {
+                int color = strtol(colorstr+1, nullptr, 16);
+                r = (color >> 16) & 0xff;
+                g = (color >> 8) & 0xff;
+                b = color & 0xff;
+            }
+        }
 
         if (cmd == "set_pixel") {
             setPixelColor(jo["led"], r, g, b);
