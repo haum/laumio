@@ -22,10 +22,17 @@ void LaumioHttpApi::handleApi()
         answer["version"] = "devel";
 
     } else {
-        String jsonRequestStr;
         bool success = false;
-        if (server.hasArg("plain")) {
-            jsonRequestStr = server.arg("plain");
+        if (server.args() > 1) {
+            StaticJsonBuffer <200> jsonBufferQuery;
+            JsonObject & query = jsonBufferQuery.createObject();
+            for (int i = 0; i < server.args(); i++) {
+                query[server.argName(i)] = server.arg(i);
+            }
+            success = leds.jsonCommands(query);
+
+        } else if (server.hasArg("plain")) {
+            String jsonRequestStr = server.arg("plain");
             success = leds.jsonCommands(jsonRequestStr.c_str());
         }
 
