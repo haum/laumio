@@ -2,7 +2,8 @@ Laumio's anatomy and HEX commands
 =================================
 
 The Laumio can be controlled using the bare-UDP API using simple HEX commands sent on the
-**port 6969**. It can alternatively receive commands from a REST API.
+**port 6969**, using REST API or through MQTT.
+
 Four different features can be set : the pixel, ring, column and the whole Laumio at once.
 Additionnaly, some animations can be triggered.
 
@@ -72,30 +73,230 @@ connect to a Wifi network::
   0x0a
 
 
-JSON API
+REST API
 --------
 
-The JSON API is still a work in progress and every UDP-supported call has not been
-translated yet.
+The REST API can be called by sending JSON data to the ``/api/`` endpoint.
 
 Status
 ******
 
-The status of the Laumio can be retrieved using the ``/api/`` endpoint::
+The status of the Laumio can be retrieved using a simple ``GET`` request, no data requiered::
 
-  GET http://<laumio's ip>/api/
+  GET http://<laumio_ip>/api/
 
 The response is given in the form :
 
 .. code-block:: javascript
 
-  {"name":"laumio","version":"devel"}
+  {"hostname":"laumio","version":"devel"}
 
-Pixel-wise control
-******************
+Commands
+********
 
-The Laumio can be controlled through simple POST requests, specifying both the ``led`` and
-``rgb`` key:
+The Laumio can be controlled through simple POST requests with JSON content. See
+JSON API for details about JSON content to send.
+
+In case of success:
+
+.. code-block:: javascript
+
+  {"hostname":"laumio","status":"Success"}
+
+In case of failure:
+
+.. code-block:: javascript
+
+  {"hostname":"laumio","status":"Invalid Request","massage":"Unable to parse JSON"}
+
+
+MQTT API
+--------
+
+If the laumio can connect to your broker, it can be controlled through MQTT.
+
+Online status
+*************
+
+At connection laumio publishes to the topic ``laumio/<name>/status`` is online status,
+if laumio will go offline this topic will send an offline status
+
+Advertise
+*********
+
+At connection, it publishes its name to the topic ``laumio/status/advertise``.
+
+The same message is sent when it receives a ``discover`` command.
+
+Commands
+********
+
+The command is chosen with the topic: ``laumio/all/<cmd>`` or ``laumio/<name>/<cmd>``
+whether you want to send it to all connected clients or to a specific one.
+
+set_pixel
+~~~~~~~~~
+
+Change color of a led.
+
+The 4 bytes payload is the led number followed by red, green, blue components of the color (0-255 range)
+
+set_ring
+~~~~~~~~~
+
+Change color of a ring.
+
+The 4 bytes payload is the ring number followed by red, green, blue components of the color (0-255 range)
+
+set_column
+~~~~~~~~~~
+
+Change color of a column.
+
+The 4 bytes payload is the column number followed by red, green, blue components of the color (0-255 range).
+
+color_wipe
+~~~~~~~~~~
+
+Start color wipe animation with a given color and duration.
+
+The 4 bytes payload is red, green, blue components of the color (0-255 range) followed by duration.
+
+animate_rainbow
+~~~~~~~~~~~~~~~
+
+Start rainbow animation.
+
+Payload is ignored.
+
+fill
+~~~~
+
+Set the same color for all leds.
+
+The 3 bytes payload is red, green, blue components of the color (0-255 range).
+
+json
+~~~~
+
+Send JSON commands through the JSON API.
+
+discover
+~~~~~~~~
+
+Send back a ``laumio/status/advertise`` message with its name as payload.
+
+
+JSON API
+--------
+
+This API cannot be used alone. It is accessed either though MQTT ``json`` command or REST API.
+
+Commands
+********
+
+set_pixel
+~~~~~~~~~
+
+Change color of a led.
+
+.. code-block:: javascript
+
+  {
+    'command': 'set_pixel',
+    'led': PixelID,
+    'rgb': [R, G, B]
+  }
+
+set_ring
+~~~~~~~~~
+
+Change color of a ring.
+
+.. code-block:: javascript
+
+  {
+    'command': 'set_ring',
+    'ring': RingID,
+    'rgb': [R, G, B]
+  }
+
+set_column
+~~~~~~~~~~
+
+Change color of a column.
+
+.. code-block:: javascript
+
+  {
+    'command': 'set_column',
+    'column': ColumnID,
+    'rgb': [R, G, B]
+  }
+
+color_wipe
+~~~~~~~~~~
+
+Start color wipe animation with a given color and duration.
+
+.. code-block:: javascript
+
+  {
+    'command': 'color_wipe',
+    'duration': Duration,
+    'rgb': [R, G, B]
+  }
+
+animate_rainbow
+~~~~~~~~~~~~~~~
+
+Start rainbow animation.
+
+.. code-block:: javascript
+
+  {
+    'command': 'animate_rainbow',
+  }
+
+fill
+~~~~
+
+Set the same color for all leds.
+
+.. code-block:: javascript
+
+  {
+    'command': 'fill',
+    'rgb': [R, G, B]
+  }
+
+Multiple commands
+*****************
+
+A few commands can be chained in one call when set in the same array named
+``commands``, but beware that the size of JSON is somewhat limited.
+
+
+.. code-block:: javascript
+
+  {
+    'commands': [
+      {
+        'command': 'set_column',
+        'column': 0,
+        'rgb': [255, 0, 0]
+      },
+      {
+        'command': 'set_column',
+        'column': 2,
+        'rgb': [0, 0, 255]
+      }
+    ]
+  }
+
+
+Pixel-wise control (legacy API)
+*******************************
 
 .. code-block:: javascript
 
@@ -104,11 +305,8 @@ The Laumio can be controlled through simple POST requests, specifying both the `
     'rgb': [R, G, B]
   }
 
-Full span control
-*****************
-
-To control the full Laumio at once, just set the ``led`` parameter to 255 in the previous
-JSON snippet:
+Full span control (legacy API)
+******************************
 
 .. code-block:: javascript
 
@@ -116,3 +314,4 @@ JSON snippet:
     'led': 255,
     'rgb': [R, G, B]
   }
+

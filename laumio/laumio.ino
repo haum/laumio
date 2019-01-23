@@ -28,22 +28,26 @@
 #include <WiFiUdp.h>
 #include <Adafruit_NeoPixel.h>
 #include <EEPROM.h>
+#include <ArduinoOTA.h>
 /* Perhaps other later */
 
 #include "LaumioConnect.h"
 #include "LaumioAP.h"
 #include "LaumioLeds.h"
 #include "LaumioHttp.h"
-#include "LaumioApi.h"
+#include "LaumioHttpApi.h"
 #include "LaumioUdpRemoteControl.h"
+#include "LaumioMQTT.h"
 
 LaumioLeds leds(NUM_PIXELS, DIN_PIN);
 LaumioHttp httpServer;
-LaumioApi api(leds, httpServer);
+LaumioHttpApi api(leds, httpServer);
 LaumioUdpRemoteControl udpRC(leds);
 LaumioAP ap(httpServer);
 
 LaumioConnect conn;
+LaumioMQTT mqtt_client(leds);
+
 int connectCounter = 0;
 
 char const *AP_PASS = "";
@@ -64,6 +68,41 @@ void setup()
     Serial.println(hostString);
 
     conn.setHostname(hostString);
+
+  ArduinoOTA.setHostname(hostString);
+
+  ArduinoOTA.onStart([]() {
+    String type;
+    if (ArduinoOTA.getCommand() == U_FLASH) {
+      type = "sketch";
+    } else { // U_SPIFFS
+      type = "filesystem";
+    }
+
+    // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
+    Serial.println("Start updating " + type);
+  });
+  ArduinoOTA.onEnd([]() {
+    Serial.println("\nEnd");
+  });
+  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+    Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+  });
+  ArduinoOTA.onError([](ota_error_t error) {
+    Serial.printf("Error[%u]: ", error);
+    if (error == OTA_AUTH_ERROR) {
+      Serial.println("Auth Failed");
+    } else if (error == OTA_BEGIN_ERROR) {
+      Serial.println("Begin Failed");
+    } else if (error == OTA_CONNECT_ERROR) {
+      Serial.println("Connect Failed");
+    } else if (error == OTA_RECEIVE_ERROR) {
+      Serial.println("Receive Failed");
+    } else if (error == OTA_END_ERROR) {
+      Serial.println("End Failed");
+    }
+  });
+
 }
 
 enum State { off, start, wifi_sta_connecting, wifi_sta_connected,
@@ -75,6 +114,8 @@ State laumio_previous_state = off;
 
 void loop()
 {
+ArduinoOTA.handle();
+
     // Changement d'état
     if (laumio_previous_state != laumio_state) {
         laumio_previous_state = laumio_state;
@@ -123,6 +164,8 @@ void loop()
         leds.animate(LaumioLeds::Animation::Happy);
         udpRC.begin();
         MDNS.begin(hostString);
+        mqtt_client.begin();
+        ArduinoOTA.begin();
         laumio_state = ready;
         break;
     case wifi_sta_abort:
@@ -131,6 +174,7 @@ void loop()
     case ready:
         httpServer.handleClient();
         udpRC.handleMessage();
+        mqtt_client.loop();
         break;
     }
 }

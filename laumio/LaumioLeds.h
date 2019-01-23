@@ -2,7 +2,7 @@
 #define LAUMIOLEDS_H
 
 #include <Adafruit_NeoPixel.h>
-
+#include <ArduinoJson.h>
 
 class LaumioLeds {
 
@@ -61,6 +61,9 @@ class LaumioLeds {
     void colorWipe(uint32_t c, uint8_t wait);
     void rainbowCycle(uint8_t wait);
     uint32_t Wheel(byte WheelPos);
+
+    bool jsonCommands(const char * str);
+    bool jsonCommands(JsonObject & jo);
 
   private:
 
