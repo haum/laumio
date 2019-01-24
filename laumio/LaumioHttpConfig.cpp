@@ -34,7 +34,11 @@ bool LaumioHttpConfig::jsonCommands(JsonObject &jo) {
 		config.mqtt_password.setValue(jo["password"].asString());
 		config.saveToEEPROM();
 		return true;
+
+	} else if (cmd == "reboot") {
+		ESP.restart();
 	}
+
 	return false;
 }
 

@@ -139,6 +139,11 @@ void LaumioHttp::handleRoot() {
 				<input name="password" type="password" placeholder="Password" title="Password" value="^" /><br/>
 				<input type="submit" />
 			</form>
+			<form method="post" action="/config/">
+				<h2>Reboot</h2>
+				<input name="command" type="hidden" value="reboot" />
+				<input type="submit" />
+			</form>
 		</section>
 		<script>
 			forms = document.body.getElementsByTagName('form');
