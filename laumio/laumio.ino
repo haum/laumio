@@ -31,6 +31,7 @@
 #include <ArduinoOTA.h>
 /* Perhaps other later */
 
+#include "LaumioConfig.h"
 #include "LaumioAP.h"
 #include "LaumioLeds.h"
 #include "LaumioHttp.h"
@@ -39,6 +40,8 @@
 #include "LaumioMQTT.h"
 
 LaumioLeds leds(NUM_PIXELS, DIN_PIN);
+LaumioConfig config;
+
 LaumioHttp httpServer;
 LaumioHttpApi api(leds, httpServer);
 LaumioUdpRemoteControl udpRC(leds);
@@ -48,32 +51,28 @@ LaumioMQTT mqtt_client(leds);
 
 int connectCounter = 0;
 
-char config_ap_password[32] = "";
-char config_hostname[32] = "";
-char config_connect_essid[32] = "";
-char config_connect_password[32] = "";
-
 void setup()
 {
     Serial.begin(115200);
     Serial.println();
     leds.begin();
+    config.readFromEEPROM();
     httpServer.begin();
     api.begin();
     delay(1000);
 
-    char hostString[14];
-    sprintf(hostString, "Laumio_%06X", ESP.getChipId());
-
-    if (!strcmp(config_hostname, ""))
-        strcpy(config_hostname, hostString);
+    if (!strcmp(config.hostname.value(), "")) {
+        char hostString[14];
+        sprintf(hostString, "Laumio_%06X", ESP.getChipId());
+        config.hostname.setValue(hostString);
+    }
 
     Serial.print("Hostname: ");
-    Serial.println(config_hostname);
+    Serial.println(config.hostname.value());
 
-    WiFi.hostname(config_hostname);
+    WiFi.hostname(config.hostname.value());
 
-    ArduinoOTA.setHostname(config_hostname);
+    ArduinoOTA.setHostname(config.hostname.value());
 
   ArduinoOTA.onStart([]() {
     String type;
@@ -132,14 +131,14 @@ ArduinoOTA.handle();
         case wifi_sta_connecting:
             Serial.println();
             Serial.print("Wi-Fi: Connecting to '");
-            Serial.print(config_connect_essid);
+            Serial.print(config.connect_essid.value());
             Serial.println("' ...");
 
-            WiFi.begin(config_connect_essid, config_connect_password);
+            WiFi.begin(config.connect_essid.value(), config.connect_password.value());
             break;
         case wifi_sta_abort:
             leds.colorWipe(0xff3c00, 100);
-            ap.begin(config_hostname, config_ap_password);
+            ap.begin(config.hostname.value(), "");
             break;
         }
     }
@@ -169,7 +168,7 @@ ArduinoOTA.handle();
     case wifi_sta_connected:
         leds.animate(LaumioLeds::Animation::Happy);
         udpRC.begin();
-        MDNS.begin(config_hostname);
+        MDNS.begin(config.hostname.value());
         mqtt_client.begin();
         ArduinoOTA.begin();
         laumio_state = ready;
