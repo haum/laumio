@@ -45,6 +45,9 @@ void LaumioHttp::handleRoot()
 			h1 { font-size: x-large; color: #CC8A4D; }
 			h2 { font-size: large; color: #4D97CC; }
 			a { color: #93859D; }
+			form.form_sending input[type=submit] { color: #00aaaa; }
+			form.form_failure input[type=submit] { color: #aa0000; }
+			form.form_success input[type=submit] { color: #00aa00; }
 			@media (max-width: 835px) {
 				section, section.wide {
 					float: none;
@@ -138,6 +141,45 @@ void LaumioHttp::handleRoot()
 				<input type="submit" />
 			</form>
 		</section>
+		<script>
+			forms = document.body.getElementsByTagName('form');
+			for (var i = 0; i < forms.length; i++) {
+				forms[i].onsubmit = function(e) {
+					e.preventDefault();
+					this.classList.add("form_sending");
+					this.classList.remove("form_success");
+					this.classList.remove("form_failure");
+					var formData = new FormData(this);
+					var xmlhttp;
+					if (window.XMLHttpRequest) xmlhttp = new XMLHttpRequest();
+					else xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+					xmlhttp.open("POST", this.action);
+					xmlhttp.overrideMimeType('application/json');
+					var form = this;
+					xmlhttp.onreadystatechange = function () {
+						if (xmlhttp.readyState == 4) {
+							if(xmlhttp.status == 200) {
+								json = JSON.parse(xmlhttp.responseText);
+								if (json["status"] == "Success")
+									form.classList.add("form_success");
+								else
+									form.classList.add("form_failure");
+								form.classList.remove("form_sending");
+							}
+						}
+					};
+					xmlhttp.onerror = function () {
+						form.classList.add("form_failure");
+						form.classList.remove("form_sending");
+					};
+					xmlhttp.onabort = function () {
+						form.classList.add("form_failure");
+						form.classList.remove("form_sending");
+					};
+					xmlhttp.send(formData);
+				};
+			}
+		</script>
 	</body>
 </html>)";
 
