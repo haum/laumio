@@ -5,7 +5,6 @@
 #include <ArduinoJson.h>
 
 class LaumioLeds {
-
   public:
 	enum Led {
 		A_Bottom = 0,
@@ -58,7 +57,7 @@ class LaumioLeds {
 
 	void colorWipe(uint32_t c, uint8_t wait);
 	void rainbowCycle(uint8_t wait);
-	uint32_t Wheel(byte WheelPos);
+	uint32_t wheel(byte wheelPos);
 
 	bool jsonCommands(const char *str);
 	bool jsonCommands(JsonObject &jo);

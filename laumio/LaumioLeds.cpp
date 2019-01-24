@@ -121,7 +121,7 @@ void LaumioLeds::rainbowCycle(uint8_t wait) {
 	for (j = 0; j < 256 * 5; j++) { // 5 cycles of all colors on wheel
 		for (i = 0; i < strip.numPixels(); i++) {
 			strip.setPixelColor(
-			    i, Wheel(((i * 256 / strip.numPixels()) + j) & 255));
+			    i, wheel(((i * 256 / strip.numPixels()) + j) & 255));
 		}
 		strip.show();
 		delay(wait);
@@ -130,21 +130,21 @@ void LaumioLeds::rainbowCycle(uint8_t wait) {
 
 // Input a value 0 to 255 to get a color value.
 // The colours are a transition r - g - b - back to r.
-uint32_t LaumioLeds::Wheel(byte WheelPos) {
-	WheelPos = 255 - WheelPos;
-	if (WheelPos < 85) {
-		return strip.Color(255 - WheelPos * 3, 0, WheelPos * 3);
+uint32_t LaumioLeds::wheel(byte wheelPos) {
+	wheelPos = 255 - wheelPos;
+	if (wheelPos < 85) {
+		return strip.Color(255 - wheelPos * 3, 0, wheelPos * 3);
 	}
-	if (WheelPos < 170) {
-		WheelPos -= 85;
-		return strip.Color(0, WheelPos * 3, 255 - WheelPos * 3);
+	if (wheelPos < 170) {
+		wheelPos -= 85;
+		return strip.Color(0, wheelPos * 3, 255 - wheelPos * 3);
 	}
-	WheelPos -= 170;
-	return strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
+	wheelPos -= 170;
+	return strip.Color(wheelPos * 3, 255 - wheelPos * 3, 0);
 }
 
 bool LaumioLeds::jsonCommands(const char *str) {
-	StaticJsonBuffer<800> jsonBuffer; // Reserve memory space for json
+	StaticJsonBuffer<800> jsonBuffer;
 	JsonObject &obj = jsonBuffer.parseObject(str);
 	return obj.success() && jsonCommands(obj);
 }
@@ -158,7 +158,7 @@ bool LaumioLeds::jsonCommands(JsonObject &jo) {
 			ok &= jsonCommands(var.as<JsonObject>());
 		return ok;
 
-	} else if (jo.containsKey("command")) { // New api
+	} else if (jo.containsKey("command")) {
 		const auto &cmd = jo["command"];
 
 		int r = jo["rgb"][0];
