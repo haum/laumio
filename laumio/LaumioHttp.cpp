@@ -2,7 +2,7 @@
 
 #include <ESP8266mDNS.h>
 
-LaumioHttp::LaumioHttp(ESP8266WebServer & s) : server(s) {
+LaumioHttp::LaumioHttp(LaumioConfig & c, ESP8266WebServer & s) : server(s), config(c) {
     server.on("/", std::bind(&LaumioHttp::handleRoot, this));
     server.onNotFound(std::bind(&LaumioHttp::handleNotFound, this));
 }
@@ -110,23 +110,99 @@ void LaumioHttp::handleRoot()
 		</section>
 		<section>
 			<h1>Config</h1>
-			<p>No config yet.</p>
+			<form method="post" action="/config/">
+				<h2>Connect <input name="enabled" type="checkbox" title="Enable" ^/></h2>
+				<input name="command" type="hidden" value="config_connect" />
+				<input name="essid" type="text" placeholder="Essid" title="Essid" value="^" /><br/>
+				<input name="password" type="password" placeholder="Password" title="Password" value="^" /><br/>
+				<input type="submit" />
+			</form>
+			<form method="post" action="/config/">
+				<h2>Access point <input name="enabled" type="checkbox" title="Enable" ^/></h2>
+				<input name="command" type="hidden" value="config_ap" />
+				<input name="essid" type="text" placeholder="Essid" title="Essid" value="^" /><br/>
+				<input name="password" type="password" placeholder="Password" title="Password" value="^" /><br/>
+				<input type="submit" />
+			</form>
+			<form method="post" action="/config/">
+				<h2>Fallback access point <input name="enabled" type="checkbox" title="Enable" ^/></h2>
+				<input name="command" type="hidden" value="config_apfallback" />
+				<input type="submit" />
+			</form>
+			<form method="post" action="/config/">
+				<h2>MQTT <input name="enabled" type="checkbox" title="Enable" ^/></h2>
+				<input name="command" type="hidden" value="config_mqtt" />
+				<input name="host" type="text" placeholder="Brocker address" title="Brocker address" value="^" /><br/>
+				<input name="user" type="text" placeholder="User" title="User" value="^" /><br/>
+				<input name="password" type="password" placeholder="Password" title="Password" value="^" /><br/>
+				<input type="submit" />
+			</form>
 		</section>
 	</body>
 </html>)";
 
-    auto dynData = [](char * buffer, int buffersz, int nb) {
+    auto dynData = [&](char * buffer, int buffersz, int nb) {
         switch(nb) {
             case 0:
                 WiFi.hostname().toCharArray(buffer, buffersz);
                 break;
 
             case 1:
-                int sec = millis() / 1000;
-                int min = sec / 60;
-                int hr = min / 60;
-                sprintf(buffer, "%02d:%02d:%02d", hr, min % 60, sec % 60);
+                {
+                    int sec = millis() / 1000;
+                    int min = sec / 60;
+                    int hr = min / 60;
+                    sprintf(buffer, "%02d:%02d:%02d", hr, min % 60, sec % 60);
+                }
                 break;
+
+            case 2:
+               if (config.connect_enabled)
+                   strcpy(buffer, R"(checked="checked" )");
+               break;
+
+            case 3:
+               strcpy(buffer, config.connect_essid.value());
+               break;
+
+            case 4:
+               strcpy(buffer, config.connect_password.value());
+               break;
+
+            case 5:
+               if (config.ap_enabled)
+                   strcpy(buffer, R"(checked="checked" )");
+               break;
+
+            case 6:
+               strcpy(buffer, config.ap_essid.value());
+               break;
+
+            case 7:
+               strcpy(buffer, config.ap_password.value());
+               break;
+
+            case 8:
+               if (config.apfallback_enabled)
+                   strcpy(buffer, R"(checked="checked" )");
+               break;
+
+            case 9:
+               if (config.mqtt_enabled)
+                   strcpy(buffer, R"(checked="checked" )");
+               break;
+
+            case 10:
+               strcpy(buffer, config.mqtt_host.value());
+               break;
+
+            case 11:
+               strcpy(buffer, config.mqtt_user.value());
+               break;
+
+            case 12:
+               strcpy(buffer, config.mqtt_password.value());
+               break;
         }
     };
 
@@ -152,7 +228,8 @@ void LaumioHttp::handleRoot()
             buffer[0] = 0;
             dynData(buffer, sizeof(buffer), dynDataNb);
             dynDataNb++;
-            server.sendContent(buffer);
+            if (buffer[0])
+                server.sendContent(buffer);
             htmlsend += 1;
         }
     }

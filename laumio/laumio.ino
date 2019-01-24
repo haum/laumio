@@ -44,7 +44,7 @@ LaumioLeds leds(NUM_PIXELS, DIN_PIN);
 LaumioConfig config;
 
 ESP8266WebServer webserver(80);
-LaumioHttp http_handler(webserver);
+LaumioHttp http_handler(config, webserver);
 LaumioHttpApi http_api_handler(leds, webserver);
 LaumioHttpConfig http_config_path(config, webserver);
 
