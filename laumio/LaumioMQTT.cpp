@@ -22,7 +22,7 @@ void LaumioMQTT::begin() {
 void LaumioMQTT::loop() {
 	if (!client.connected()) {
 		long now = millis();
-		if (now - lastReconnectAttemptDate > 5000) {
+		if (now - lastReconnectAttemptDate > 10 * 1000) {
 			lastReconnectAttemptDate = now;
 
 			// Attempt to reconnect
@@ -51,7 +51,6 @@ void LaumioMQTT::loop() {
 			}
 
 			if (client.connected()) {
-				Serial.println("MQTT Connected");
 				lastReconnectAttemptDate = 0;
 			}
 		}
