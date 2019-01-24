@@ -43,8 +43,7 @@ bool LaumioHttpConfig::jsonCommands(JsonObject &jo) {
 }
 
 void LaumioHttpConfig::handleConfig() {
-	StaticJsonBuffer<200>
-	    jsonBufferAnswer; // Reserve memory space for answer json
+	StaticJsonBuffer<200> jsonBufferAnswer;
 	JsonObject &answer = jsonBufferAnswer.createObject();
 	int answerCode = 200;
 
