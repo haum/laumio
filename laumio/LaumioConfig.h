@@ -35,6 +35,7 @@ class LaumioConfig {
 			if (len > N - 1)
 				len = N - 1;
 			memcpy(this->_buffer, s, len);
+			this->_buffer[len] = 0;
 		}
 		operator char *() { return value(); }
 	};
