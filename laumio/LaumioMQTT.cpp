@@ -1,5 +1,4 @@
 #include "LaumioMQTT.h"
-#include "mqtt-config.h"
 
 namespace { // All in this namespace is soup to make the lib call a member-function instead of global-space-function
 LaumioMQTT * mqtt = nullptr;
@@ -9,14 +8,14 @@ void mqtt_callback(char* topic, byte* payload, unsigned int length) {
 }
 }
 
-LaumioMQTT::LaumioMQTT(LaumioLeds & l) : leds(l) {
+LaumioMQTT::LaumioMQTT(LaumioLeds & l, LaumioConfig & c) : leds(l), config(c) {
   mqtt = this;
 }
 
 void LaumioMQTT::begin() {
-  client.setServer(mqtt_server, 1883);
+  client.setServer(config.mqtt_host.value(), 1883);
   client.setCallback(mqtt_callback);
-  sprintf(NameString, "Laumio_%06X", ESP.getChipId());
+  strncpy(NameString, config.hostname.value(), sizeof(NameString));
 }
 
 void LaumioMQTT::loop() {
@@ -29,7 +28,7 @@ void LaumioMQTT::loop() {
       char myWillTopics[14+13];
       sprintf(myWillTopics, "laumio/status/%13s", NameString);
       // boolean connect (clientID, username, password, willTopic, willQoS, willRetain, willMessage)
-      if (client.connect(NameString, mqtt_user, mqtt_pass, myWillTopics, 0, 1, "offline" )) {
+      if (client.connect(NameString, config.mqtt_user.value(), config.mqtt_password.value(), myWillTopics, 0, 1, "offline" )) {
         Serial.println(" connected.");
 
         // Once connected, publish an announcement...

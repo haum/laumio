@@ -47,7 +47,7 @@ LaumioHttpApi api(leds, httpServer);
 LaumioUdpRemoteControl udpRC(leds);
 LaumioAP ap(httpServer);
 
-LaumioMQTT mqtt_client(leds);
+LaumioMQTT mqtt_client(leds, config);
 
 int connectCounter = 0;
 
