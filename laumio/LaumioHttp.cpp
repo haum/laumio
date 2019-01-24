@@ -2,32 +2,31 @@
 
 #include <ESP8266mDNS.h>
 
-LaumioHttp::LaumioHttp(LaumioConfig & c, ESP8266WebServer & s) : server(s), config(c) {
-    server.on("/", std::bind(&LaumioHttp::handleRoot, this));
-    server.onNotFound(std::bind(&LaumioHttp::handleNotFound, this));
+LaumioHttp::LaumioHttp(LaumioConfig &c, ESP8266WebServer &s)
+    : server(s), config(c) {
+	server.on("/", std::bind(&LaumioHttp::handleRoot, this));
+	server.onNotFound(std::bind(&LaumioHttp::handleNotFound, this));
 }
 
-void LaumioHttp::handleNotFound()
-{
-    String message = "File Not Found\n\n";
-    message += "URI: ";
-    message += server.uri();
-    message += "\nMethod: ";
-    message += (server.method() == HTTP_GET) ? "GET" : "POST";
-    message += "\nArguments: ";
-    message += server.args();
-    message += "\n";
+void LaumioHttp::handleNotFound() {
+	String message = "File Not Found\n\n";
+	message += "URI: ";
+	message += server.uri();
+	message += "\nMethod: ";
+	message += (server.method() == HTTP_GET) ? "GET" : "POST";
+	message += "\nArguments: ";
+	message += server.args();
+	message += "\n";
 
-    for (uint8_t i = 0; i < server.args(); i++) {
-        message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
-    }
+	for (uint8_t i = 0; i < server.args(); i++) {
+		message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+	}
 
-    server.send(404, "text/plain", message);
+	server.send(404, "text/plain", message);
 }
 
-void LaumioHttp::handleRoot()
-{
-    const auto html = R"(
+void LaumioHttp::handleRoot() {
+	const auto html = R"(
 <html>
 	<head>
 		<title>Laumio</title>
@@ -183,97 +182,94 @@ void LaumioHttp::handleRoot()
 	</body>
 </html>)";
 
-    auto dynData = [&](char * buffer, int buffersz, int nb) {
-        switch(nb) {
-            case 0:
-                WiFi.hostname().toCharArray(buffer, buffersz);
-                break;
+	auto dynData = [&](char *buffer, int buffersz, int nb) {
+		switch (nb) {
+		case 0:
+			WiFi.hostname().toCharArray(buffer, buffersz);
+			break;
 
-            case 1:
-                {
-                    int sec = millis() / 1000;
-                    int min = sec / 60;
-                    int hr = min / 60;
-                    sprintf(buffer, "%02d:%02d:%02d", hr, min % 60, sec % 60);
-                }
-                break;
+		case 1: {
+			int sec = millis() / 1000;
+			int min = sec / 60;
+			int hr = min / 60;
+			sprintf(buffer, "%02d:%02d:%02d", hr, min % 60, sec % 60);
+		} break;
 
-            case 2:
-               if (config.connect_enabled)
-                   strcpy(buffer, R"(checked="checked" )");
-               break;
+		case 2:
+			if (config.connect_enabled)
+				strcpy(buffer, R"(checked="checked" )");
+			break;
 
-            case 3:
-               strcpy(buffer, config.connect_essid.value());
-               break;
+		case 3:
+			strcpy(buffer, config.connect_essid.value());
+			break;
 
-            case 4:
-               strcpy(buffer, config.connect_password.value());
-               break;
+		case 4:
+			strcpy(buffer, config.connect_password.value());
+			break;
 
-            case 5:
-               if (config.ap_enabled)
-                   strcpy(buffer, R"(checked="checked" )");
-               break;
+		case 5:
+			if (config.ap_enabled)
+				strcpy(buffer, R"(checked="checked" )");
+			break;
 
-            case 6:
-               strcpy(buffer, config.ap_essid.value());
-               break;
+		case 6:
+			strcpy(buffer, config.ap_essid.value());
+			break;
 
-            case 7:
-               strcpy(buffer, config.ap_password.value());
-               break;
+		case 7:
+			strcpy(buffer, config.ap_password.value());
+			break;
 
-            case 8:
-               if (config.apfallback_enabled)
-                   strcpy(buffer, R"(checked="checked" )");
-               break;
+		case 8:
+			if (config.apfallback_enabled)
+				strcpy(buffer, R"(checked="checked" )");
+			break;
 
-            case 9:
-               if (config.mqtt_enabled)
-                   strcpy(buffer, R"(checked="checked" )");
-               break;
+		case 9:
+			if (config.mqtt_enabled)
+				strcpy(buffer, R"(checked="checked" )");
+			break;
 
-            case 10:
-               strcpy(buffer, config.mqtt_host.value());
-               break;
+		case 10:
+			strcpy(buffer, config.mqtt_host.value());
+			break;
 
-            case 11:
-               strcpy(buffer, config.mqtt_user.value());
-               break;
+		case 11:
+			strcpy(buffer, config.mqtt_user.value());
+			break;
 
-            case 12:
-               strcpy(buffer, config.mqtt_password.value());
-               break;
-        }
-    };
+		case 12:
+			strcpy(buffer, config.mqtt_password.value());
+			break;
+		}
+	};
 
-    // Send html string, and call dynData(...) to replace each '^'.
-    char buffer[512];
-    server.setContentLength(CONTENT_LENGTH_UNKNOWN);
-    server.send(200, "text/html", ""); // Send headers
-    int dynDataNb = 0;
-    const char * const htmlend = html + strlen(html);
-    const char * htmlsend = html;
-    const char * it = htmlsend - 1;
-    while (htmlsend < htmlend - 1) {
-        if (it <= htmlsend + 1) {
-            it = std::find(it+1, htmlend, '^');
-        }
-        int vol = it - htmlsend - 1;
-        vol = std::min(vol, int(sizeof(buffer)-1));
-        memcpy(buffer, htmlsend + 1, vol);
-        buffer[vol] = 0;
-        htmlsend += vol;
-        server.sendContent(buffer);
-        if (it <= htmlsend + 1 && it != htmlend) {
-            buffer[0] = 0;
-            dynData(buffer, sizeof(buffer), dynDataNb);
-            dynDataNb++;
-            if (buffer[0])
-                server.sendContent(buffer);
-            htmlsend += 1;
-        }
-    }
-
+	// Send html string, and call dynData(...) to replace each '^'.
+	char buffer[512];
+	server.setContentLength(CONTENT_LENGTH_UNKNOWN);
+	server.send(200, "text/html", ""); // Send headers
+	int dynDataNb = 0;
+	const char *const htmlend = html + strlen(html);
+	const char *htmlsend = html;
+	const char *it = htmlsend - 1;
+	while (htmlsend < htmlend - 1) {
+		if (it <= htmlsend + 1) {
+			it = std::find(it + 1, htmlend, '^');
+		}
+		int vol = it - htmlsend - 1;
+		vol = std::min(vol, int(sizeof(buffer) - 1));
+		memcpy(buffer, htmlsend + 1, vol);
+		buffer[vol] = 0;
+		htmlsend += vol;
+		server.sendContent(buffer);
+		if (it <= htmlsend + 1 && it != htmlend) {
+			buffer[0] = 0;
+			dynData(buffer, sizeof(buffer), dynDataNb);
+			dynDataNb++;
+			if (buffer[0])
+				server.sendContent(buffer);
+			htmlsend += 1;
+		}
+	}
 }

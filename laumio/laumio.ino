@@ -20,25 +20,25 @@
 #define NUM_PIXELS 13
 
 /* Old versions of Arduino pseudo-IDE need these to compile the code **/
+#include <Adafruit_NeoPixel.h>
+#include <ArduinoJson.h>
+#include <ArduinoOTA.h>
+#include <DNSServer.h>
+#include <EEPROM.h>
+#include <ESP8266WebServer.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
-#include <ESP8266WebServer.h>
-#include <ArduinoJson.h>
-#include <DNSServer.h>
 #include <WiFiUdp.h>
-#include <Adafruit_NeoPixel.h>
-#include <EEPROM.h>
-#include <ArduinoOTA.h>
 /* Perhaps other later */
 
-#include "LaumioConfig.h"
 #include "LaumioAP.h"
-#include "LaumioLeds.h"
+#include "LaumioConfig.h"
 #include "LaumioHttp.h"
 #include "LaumioHttpApi.h"
 #include "LaumioHttpConfig.h"
-#include "LaumioUdpRemoteControl.h"
+#include "LaumioLeds.h"
 #include "LaumioMQTT.h"
+#include "LaumioUdpRemoteControl.h"
 
 LaumioLeds leds(NUM_PIXELS, DIN_PIN);
 LaumioConfig config;
@@ -55,135 +55,136 @@ LaumioMQTT mqtt_client(leds, config);
 
 int connectCounter = 0;
 
-void setup()
-{
-    Serial.begin(115200);
-    Serial.println();
-    leds.begin();
-    config.readFromEEPROM();
-    webserver.begin();
-    MDNS.addService("http", "tcp", 80);
-    delay(1000);
+void setup() {
+	Serial.begin(115200);
+	Serial.println();
+	leds.begin();
+	config.readFromEEPROM();
+	webserver.begin();
+	MDNS.addService("http", "tcp", 80);
+	delay(1000);
 
-    if (!strcmp(config.hostname.value(), "")) {
-        char hostString[14];
-        sprintf(hostString, "Laumio_%06X", ESP.getChipId());
-        config.hostname.setValue(hostString);
-    }
+	if (!strcmp(config.hostname.value(), "")) {
+		char hostString[14];
+		sprintf(hostString, "Laumio_%06X", ESP.getChipId());
+		config.hostname.setValue(hostString);
+	}
 
-    Serial.print("Hostname: ");
-    Serial.println(config.hostname.value());
+	Serial.print("Hostname: ");
+	Serial.println(config.hostname.value());
 
-    WiFi.hostname(config.hostname.value());
+	WiFi.hostname(config.hostname.value());
 
-    ArduinoOTA.setHostname(config.hostname.value());
+	ArduinoOTA.setHostname(config.hostname.value());
 
-  ArduinoOTA.onStart([]() {
-    String type;
-    if (ArduinoOTA.getCommand() == U_FLASH) {
-      type = "sketch";
-    } else { // U_SPIFFS
-      type = "filesystem";
-    }
+	ArduinoOTA.onStart([]() {
+		String type;
+		if (ArduinoOTA.getCommand() == U_FLASH) {
+			type = "sketch";
+		} else { // U_SPIFFS
+			type = "filesystem";
+		}
 
-    // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
-    Serial.println("Start updating " + type);
-  });
-  ArduinoOTA.onEnd([]() {
-    Serial.println("\nEnd");
-  });
-  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-    Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
-  });
-  ArduinoOTA.onError([](ota_error_t error) {
-    Serial.printf("Error[%u]: ", error);
-    if (error == OTA_AUTH_ERROR) {
-      Serial.println("Auth Failed");
-    } else if (error == OTA_BEGIN_ERROR) {
-      Serial.println("Begin Failed");
-    } else if (error == OTA_CONNECT_ERROR) {
-      Serial.println("Connect Failed");
-    } else if (error == OTA_RECEIVE_ERROR) {
-      Serial.println("Receive Failed");
-    } else if (error == OTA_END_ERROR) {
-      Serial.println("End Failed");
-    }
-  });
-
+		// NOTE: if updating SPIFFS this would be the place to unmount SPIFFS
+		// using SPIFFS.end()
+		Serial.println("Start updating " + type);
+	});
+	ArduinoOTA.onEnd([]() { Serial.println("\nEnd"); });
+	ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+		Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+	});
+	ArduinoOTA.onError([](ota_error_t error) {
+		Serial.printf("Error[%u]: ", error);
+		if (error == OTA_AUTH_ERROR) {
+			Serial.println("Auth Failed");
+		} else if (error == OTA_BEGIN_ERROR) {
+			Serial.println("Begin Failed");
+		} else if (error == OTA_CONNECT_ERROR) {
+			Serial.println("Connect Failed");
+		} else if (error == OTA_RECEIVE_ERROR) {
+			Serial.println("Receive Failed");
+		} else if (error == OTA_END_ERROR) {
+			Serial.println("End Failed");
+		}
+	});
 }
 
-enum State { off, start, wifi_sta_connecting, wifi_sta_connected,
-        wifi_sta_abort, ready };
+enum State {
+	off,
+	start,
+	wifi_sta_connecting,
+	wifi_sta_connected,
+	wifi_sta_abort,
+	ready
+};
 State laumio_state = start;
 State laumio_previous_state = off;
 
+void loop() {
+	ArduinoOTA.handle();
 
+	// Changement d'état
+	if (laumio_previous_state != laumio_state) {
+		laumio_previous_state = laumio_state;
 
-void loop()
-{
-ArduinoOTA.handle();
+		switch (laumio_state) {
+		case ready:
+			leds.animate(LaumioLeds::Animation::Clear);
+			break;
 
-    // Changement d'état
-    if (laumio_previous_state != laumio_state) {
-        laumio_previous_state = laumio_state;
+		case wifi_sta_connecting:
+			Serial.println();
+			Serial.print("Wi-Fi: Connecting to '");
+			Serial.print(config.connect_essid.value());
+			Serial.println("' ...");
 
-        switch (laumio_state) {
-        case ready:
-            leds.animate(LaumioLeds::Animation::Clear);
-            break;
+			WiFi.begin(config.connect_essid.value(),
+			           config.connect_password.value());
+			break;
+		case wifi_sta_abort:
+			leds.colorWipe(0xff3c00, 100);
+			ap.begin(config.hostname.value(), "");
+			break;
+		}
+	}
+	// État
+	switch (laumio_state) {
+	case start:
+		leds.animate(LaumioLeds::Animation::Hello);
 
-        case wifi_sta_connecting:
-            Serial.println();
-            Serial.print("Wi-Fi: Connecting to '");
-            Serial.print(config.connect_essid.value());
-            Serial.println("' ...");
+		laumio_state = wifi_sta_connecting;
+		break;
+	case wifi_sta_connecting:
+		if (WiFi.status() != WL_CONNECTED) {
+			leds.animate(LaumioLeds::Animation::Loading);
+			connectCounter++;
 
-            WiFi.begin(config.connect_essid.value(), config.connect_password.value());
-            break;
-        case wifi_sta_abort:
-            leds.colorWipe(0xff3c00, 100);
-            ap.begin(config.hostname.value(), "");
-            break;
-        }
-    }
-    // État
-    switch (laumio_state) {
-    case start:
-        leds.animate(LaumioLeds::Animation::Hello);
-
-        laumio_state = wifi_sta_connecting;
-        break;
-    case wifi_sta_connecting:
-        if (WiFi.status() != WL_CONNECTED) {
-            leds.animate(LaumioLeds::Animation::Loading);
-            connectCounter++;
-
-            if (connectCounter > 10) {
-                laumio_state = wifi_sta_abort;
-                Serial.println("Wi-Fi: Too long, abort.");
-            }
-        } else {
-            Serial.println("Wi-Fi: Connected.");
-            Serial.print("IP Address : ");
-            Serial.println(WiFi.localIP());
-            laumio_state = wifi_sta_connected;
-        }
-        break;
-    case wifi_sta_connected:
-        leds.animate(LaumioLeds::Animation::Happy);
-        udpRC.begin();
-        MDNS.begin(config.hostname.value());
-        mqtt_client.begin();
-        ArduinoOTA.begin();
-        laumio_state = ready;
-        break;
-    case wifi_sta_abort:
-        ap.acceptDNS();
-        webserver.handleClient();
-    case ready:
-        webserver.handleClient();
-        udpRC.handleMessage();
-        mqtt_client.loop();
-        break;
-    }
+			if (connectCounter > 10) {
+				laumio_state = wifi_sta_abort;
+				Serial.println("Wi-Fi: Too long, abort.");
+			}
+		} else {
+			Serial.println("Wi-Fi: Connected.");
+			Serial.print("IP Address : ");
+			Serial.println(WiFi.localIP());
+			laumio_state = wifi_sta_connected;
+		}
+		break;
+	case wifi_sta_connected:
+		leds.animate(LaumioLeds::Animation::Happy);
+		udpRC.begin();
+		MDNS.begin(config.hostname.value());
+		mqtt_client.begin();
+		ArduinoOTA.begin();
+		laumio_state = ready;
+		break;
+	case wifi_sta_abort:
+		ap.acceptDNS();
+		webserver.handleClient();
+	case ready:
+		webserver.handleClient();
+		udpRC.handleMessage();
+		mqtt_client.loop();
+		break;
+	}
 }
