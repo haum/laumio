@@ -36,6 +36,7 @@
 #include "LaumioLeds.h"
 #include "LaumioHttp.h"
 #include "LaumioHttpApi.h"
+#include "LaumioHttpConfig.h"
 #include "LaumioUdpRemoteControl.h"
 #include "LaumioMQTT.h"
 
@@ -45,6 +46,7 @@ LaumioConfig config;
 ESP8266WebServer webserver(80);
 LaumioHttp http_handler(webserver);
 LaumioHttpApi http_api_handler(leds, webserver);
+LaumioHttpConfig http_config_path(config, webserver);
 
 LaumioUdpRemoteControl udpRC(leds);
 LaumioAP ap(webserver);
