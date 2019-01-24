@@ -8,7 +8,30 @@ LaumioHttp::LaumioHttp(LaumioConfig &c, ESP8266WebServer &s)
 	server.onNotFound(std::bind(&LaumioHttp::handleNotFound, this));
 }
 
+bool LaumioHttp::testCaptive(ESP8266WebServer &server) {
+	String host = server.hostHeader();
+	if (host != server.client().localIP().toString() &&
+	    strcmp(".local", host.c_str() + host.length() - 6) &&
+	    strcmp(".home", host.c_str() + host.length() - 5) &&
+	    strcmp(".lan", host.c_str() + host.length() - 4)) {
+		// The user is probably captured, redirect to my IP
+		server.sendHeader("Cache-Control",
+		                  "no-cache, no-store, must-revalidate");
+		server.sendHeader("Pragma", "no-cache");
+		server.sendHeader("Expires", "-1");
+		server.sendHeader(
+		    "Location", "http://" + server.client().localIP().toString() + "/",
+		    true);
+		server.send(302, "text/plain", "");
+		return true;
+	}
+	return false;
+}
+
 void LaumioHttp::handleNotFound() {
+	if (testCaptive(server))
+		return;
+
 	String message = "File Not Found\n\n";
 	message += "URI: ";
 	message += server.uri();
@@ -26,6 +49,9 @@ void LaumioHttp::handleNotFound() {
 }
 
 void LaumioHttp::handleRoot() {
+	if (testCaptive(server))
+		return;
+
 	const auto html = R"(
 <html>
 	<head>

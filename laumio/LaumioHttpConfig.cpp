@@ -43,6 +43,9 @@ bool LaumioHttpConfig::jsonCommands(JsonObject &jo) {
 }
 
 void LaumioHttpConfig::handleConfig() {
+	if (LaumioHttp::testCaptive(server))
+		return;
+
 	StaticJsonBuffer<200> jsonBufferAnswer;
 	JsonObject &answer = jsonBufferAnswer.createObject();
 	int answerCode = 200;

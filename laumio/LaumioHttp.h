@@ -8,6 +8,7 @@
 class LaumioHttp {
   public:
 	LaumioHttp(LaumioConfig &c, ESP8266WebServer &s);
+	static bool testCaptive(ESP8266WebServer &server);
 
   private:
 	ESP8266WebServer &server;

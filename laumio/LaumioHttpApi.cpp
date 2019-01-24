@@ -7,6 +7,9 @@ LaumioHttpApi::LaumioHttpApi(LaumioLeds &l, ESP8266WebServer &s)
 }
 
 void LaumioHttpApi::handleApi() {
+	if (LaumioHttp::testCaptive(server))
+		return;
+
 	StaticJsonBuffer<200> jsonBufferAnswer;
 	JsonObject &answer = jsonBufferAnswer.createObject();
 	int answerCode = 200;
