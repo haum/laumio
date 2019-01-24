@@ -1,11 +1,9 @@
 #ifndef LAUMIOMQTT_H
 #define LAUMIOMQTT_H
 
-
 #include "LaumioLeds.h"
-#include "LaumioConnect.h"
 
-// #include <Ethernet.h>
+#include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 
 class LaumioMQTT {
