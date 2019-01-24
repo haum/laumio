@@ -17,7 +17,7 @@ class LaumioAP {
 
   private:
 
-    void handleConfig();
+    void handleHello();
     void handleRedirectAP();
 
     IPAddress apip;

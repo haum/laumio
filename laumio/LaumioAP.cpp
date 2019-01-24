@@ -13,7 +13,7 @@ void LaumioAP::begin(char *ssid, char const *pass)
 
     dns.start(53, "*", apip);
 
-    server.on("/config", std::bind(&LaumioAP::handleConfig, this));
+    server.on("/hello", std::bind(&LaumioAP::handleHello, this));
     server.onNotFound(std::bind(&LaumioAP::handleRedirectAP, this));
 }
 
@@ -37,7 +37,7 @@ const char hello_html[] = {
     0x0a, 0x3c, 0x68, 0x74, 0x6d, 0x6c, 0x3e, 0x0a, 0x00
 };
 
-void LaumioAP::handleConfig()
+void LaumioAP::handleHello()
 {
     if (server.hostHeader() != apip.toString()) {
         handleRedirectAP();
@@ -53,7 +53,7 @@ void LaumioAP::handleRedirectAP()
     // se déconnecte du portail captif
     String header = String("HTTP/1.1 301 OK\r\n") +
         String("Location: http://") + apip.toString() +
-        String("/config\r\n") + String("Cache-Control: no-cache\r\n\r\n");
+        String("/hello\r\n") + String("Cache-Control: no-cache\r\n\r\n");
 
     server.sendContent(header);
 }
