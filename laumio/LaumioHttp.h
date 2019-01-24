@@ -6,21 +6,13 @@
 
 class LaumioHttp {
   public:
-
-    LaumioHttp();
-
-    void begin();
-    void handleClient();
-    void handleRoot();
+    LaumioHttp(ESP8266WebServer & s);
 
   private:
-
-     ESP8266WebServer server;
+    ESP8266WebServer & server;
 
     void handleNotFound();
-
-    friend class LaumioHttpApi;
-    friend class LaumioAP;
+    void handleRoot();
 };
 
-#endif                          // LAUMIOHTTP_H
+#endif

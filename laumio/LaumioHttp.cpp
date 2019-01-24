@@ -2,22 +2,9 @@
 
 #include <ESP8266mDNS.h>
 
-LaumioHttp::LaumioHttp()
-:  server(80)
-{
-}
-
-void LaumioHttp::begin()
-{
+LaumioHttp::LaumioHttp(ESP8266WebServer & s) : server(s) {
     server.on("/", std::bind(&LaumioHttp::handleRoot, this));
     server.onNotFound(std::bind(&LaumioHttp::handleNotFound, this));
-    server.begin();
-    MDNS.addService("http", "tcp", 80);
-}
-
-void LaumioHttp::handleClient()
-{
-    server.handleClient();
 }
 
 void LaumioHttp::handleNotFound()

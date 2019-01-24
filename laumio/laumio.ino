@@ -42,10 +42,12 @@
 LaumioLeds leds(NUM_PIXELS, DIN_PIN);
 LaumioConfig config;
 
-LaumioHttp httpServer;
-LaumioHttpApi api(leds, httpServer);
+ESP8266WebServer webserver(80);
+LaumioHttp http_handler(webserver);
+LaumioHttpApi http_api_handler(leds, webserver);
+
 LaumioUdpRemoteControl udpRC(leds);
-LaumioAP ap(httpServer);
+LaumioAP ap(webserver);
 
 LaumioMQTT mqtt_client(leds, config);
 
@@ -57,8 +59,8 @@ void setup()
     Serial.println();
     leds.begin();
     config.readFromEEPROM();
-    httpServer.begin();
-    api.begin();
+    webserver.begin();
+    MDNS.addService("http", "tcp", 80);
     delay(1000);
 
     if (!strcmp(config.hostname.value(), "")) {
@@ -175,9 +177,9 @@ ArduinoOTA.handle();
         break;
     case wifi_sta_abort:
         ap.acceptDNS();
-        httpServer.handleClient();
+        webserver.handleClient();
     case ready:
-        httpServer.handleClient();
+        webserver.handleClient();
         udpRC.handleMessage();
         mqtt_client.loop();
         break;

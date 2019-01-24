@@ -1,7 +1,6 @@
 #include "LaumioAP.h"
 
-LaumioAP::LaumioAP(LaumioHttp & h):server(h.server)
-{
+LaumioAP::LaumioAP(ESP8266WebServer & s) : server(s) {
 }
 
 void LaumioAP::begin(char *ssid, char const *pass)

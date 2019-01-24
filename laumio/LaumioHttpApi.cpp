@@ -1,18 +1,11 @@
 #include "LaumioHttpApi.h"
 
-LaumioHttpApi::LaumioHttpApi(LaumioLeds & l, LaumioHttp & s)
-:  server(s.server), leds(l)
-{
-}
-
-void LaumioHttpApi::begin()
-{
+LaumioHttpApi::LaumioHttpApi(LaumioLeds & l, ESP8266WebServer & s) : server(s), leds(l) {
     server.on("/api/", std::bind(&LaumioHttpApi::handleApi, this));
     server.on("/api", std::bind(&LaumioHttpApi::handleApi, this));
 }
 
-void LaumioHttpApi::handleApi()
-{
+void LaumioHttpApi::handleApi() {
     StaticJsonBuffer <200> jsonBufferAnswer; // Reserve memory space for answer json
     JsonObject & answer = jsonBufferAnswer.createObject();
     int answerCode = 200;

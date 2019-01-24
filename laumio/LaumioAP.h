@@ -9,7 +9,7 @@
 
 class LaumioAP {
   public:
-    LaumioAP(LaumioHttp & h);
+    LaumioAP(ESP8266WebServer & s);
 
     void begin(char *ssid, char const *pass);
     void acceptDNS();

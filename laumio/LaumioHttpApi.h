@@ -8,17 +8,13 @@
 
 class LaumioHttpApi {
   public:
-
-    LaumioHttpApi(LaumioLeds & l, LaumioHttp & h);
-
-    void begin();
+    LaumioHttpApi(LaumioLeds & l, ESP8266WebServer & s);
 
   private:
-
      ESP8266WebServer & server;
      LaumioLeds & leds;
 
     void handleApi();
 };
 
-#endif                          // LAUMIOAPI_H
+#endif
