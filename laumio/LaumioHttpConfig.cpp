@@ -43,7 +43,7 @@ void LaumioHttpConfig::handleConfig() {
     int answerCode = 200;
 
     bool success = false;
-    if (server.args() > 1) {
+    if (server.args() > 0) {
         StaticJsonBuffer <200> jsonBufferQuery;
         JsonObject & query = jsonBufferQuery.createObject();
         for (int i = 0; i < server.args(); i++) {
