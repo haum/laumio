@@ -16,34 +16,32 @@ LaumioMQTT::LaumioMQTT(LaumioLeds &l, LaumioConfig &c) : leds(l), config(c) {
 void LaumioMQTT::begin() {
 	client.setServer(config.mqtt_host.value(), 1883);
 	client.setCallback(mqtt_callback);
-	strncpy(NameString, config.hostname.value(), sizeof(NameString));
+	strncpy(topicId, config.hostname.value(), sizeof(topicId));
 }
 
 void LaumioMQTT::loop() {
 	if (!client.connected()) {
 		long now = millis();
-		if (now - lastReconnectAttempt > 5000) {
-			lastReconnectAttempt = now;
+		if (now - lastReconnectAttemptDate > 5000) {
+			lastReconnectAttemptDate = now;
+
 			// Attempt to reconnect
 			Serial.print("Attempting MQTT connection...");
-			char myWillTopics[14 + 13];
-			sprintf(myWillTopics, "laumio/status/%13s", NameString);
-			// boolean connect (clientID, username, password, willTopic,
-			// willQoS, willRetain, willMessage)
-			if (client.connect(NameString, config.mqtt_user.value(),
-			                   config.mqtt_password.value(), myWillTopics, 0, 1,
-			                   "offline")) {
+			char laumioLastWillTopic[14 + 13];
+			sprintf(laumioLastWillTopic, "laumio/status/%13s", topicId);
+			if (client.connect(topicId, config.mqtt_user.value(),
+			                   config.mqtt_password.value(),
+			                   laumioLastWillTopic, 0, 1, "offline")) {
 				Serial.println(" connected.");
 
 				// Once connected, publish an announcement...
-				client.publish(myWillTopics, "online", true);
-
-				client.publish("laumio/status/advertise", NameString);
+				client.publish(laumioLastWillTopic, "online", true);
+				client.publish("laumio/status/advertise", topicId);
 
 				// ... and resubscribe
 				client.subscribe("laumio/all/#");
 				char myTopicsWildcard[10 + 13];
-				sprintf(myTopicsWildcard, "laumio/%13s/#", NameString);
+				sprintf(myTopicsWildcard, "laumio/%13s/#", topicId);
 				client.subscribe(myTopicsWildcard);
 
 			} else {
@@ -54,7 +52,7 @@ void LaumioMQTT::loop() {
 
 			if (client.connected()) {
 				Serial.println("MQTT Connected");
-				lastReconnectAttempt = 0;
+				lastReconnectAttemptDate = 0;
 			}
 		}
 
@@ -81,7 +79,7 @@ void LaumioMQTT::callback(char *topic, byte *payload, unsigned int len) {
 		cmd = topic + 11;
 	} else {
 		char myTopicsStartWith[9 + 13];
-		sprintf(myTopicsStartWith, "laumio/%13s/", NameString);
+		sprintf(myTopicsStartWith, "laumio/%13s/", topicId);
 		if (!strncmp(topic, myTopicsStartWith, 8 + 13)) {
 			cmd = topic + 8 + 13;
 		}
@@ -90,39 +88,48 @@ void LaumioMQTT::callback(char *topic, byte *payload, unsigned int len) {
 	// Execute command
 	if (!strcmp("", cmd)) {
 		// No command, or not for me, ignore
+
 	} else if (!strcmp("set_pixel", cmd)) {
 		if (len >= 4) {
 			leds.setPixelColor(payload[0], payload[1], payload[2], payload[3]);
 			leds.show();
 		}
+
 	} else if (!strcmp("set_ring", cmd)) {
 		if (len >= 4) {
 			leds.setRingColor(payload[0], payload[1], payload[2], payload[3]);
 			leds.show();
 		}
+
 	} else if (!strcmp("set_column", cmd)) {
 		if (len >= 4) {
 			leds.setColumnColor(payload[0], payload[1], payload[2], payload[3]);
 			leds.show();
 		}
+
 	} else if (!strcmp("color_wipe", cmd)) {
 		if (len >= 4)
 			leds.colorWipe(payload[0] << 16 | payload[1] << 8 | payload[2],
 			               payload[3]);
+
 	} else if (!strcmp("animate_rainbow", cmd)) {
 		leds.rainbowCycle(1);
+
 	} else if (!strcmp("fill", cmd)) {
 		if (len >= 3) {
 			leds.fillColor(payload[0], payload[1], payload[2]);
 			leds.show();
 		}
+
 	} else if (!strcmp("json", cmd)) {
 		char payload_cstr[len + 1];
 		memcpy(payload_cstr, payload, len);
 		payload_cstr[len + 1] = 0;
 		leds.jsonCommands(payload_cstr);
+
 	} else if (!strcmp("discover", cmd)) {
-		client.publish("laumio/status/advertise", NameString);
+		client.publish("laumio/status/advertise", topicId);
+
 	} else {
 		Serial.print("Command not found: ");
 		Serial.println(cmd);

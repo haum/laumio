@@ -19,8 +19,8 @@ class LaumioMQTT {
 	LaumioLeds &leds;
 	LaumioConfig &config;
 
-	char NameString[32] = {0};
-	long lastReconnectAttempt = 0;
+	char topicId[32] = {0};
+	long lastReconnectAttemptDate = 0;
 };
 
 #endif /* LAUMIOMQTT_H */
