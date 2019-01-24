@@ -46,9 +46,9 @@ Booting
 At startup, the Laumio blinks in purple and then starts a red animation : it's looking for
 the specified Wifi network and trying to connect.
 
-If the connection is succesful, the Laumio will show a rainbow animation, if not, it will
+If the connection is successful, the Laumio will show a rainbow animation, if not, it will
 light up in orange, indicating the *Access Point* mode was started. This mode will allow
-one to specify the correct informations to connect to a Wifi network.
+one to specify the correct information to connect to a Wifi network.
 
 
 .. _Ikea FADO lamp: http://www.ikea.com/us/en/catalog/products/70096377/

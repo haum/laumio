@@ -7,6 +7,8 @@ directly using ``socat``, the Python wrapper or by... looking at the API.
 All the code is available on the dedicated `Github repo`_. Feel free to use it, clone it
 hack it, release it.
 
+A french version of this documentation is also available here_.
+
 .. toctree::
    :maxdepth: 2
 
@@ -19,3 +21,4 @@ hack it, release it.
 .. _Ikea lamp: http://www.ikea.com/us/en/catalog/products/70096377/
 .. _HAUM: https://haum.org
 .. _github repo: https://github.com/haum/laumio
+.. _here: https://laumio.readthedocs.io/fr/latest

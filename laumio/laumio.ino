@@ -20,117 +20,160 @@
 #define NUM_PIXELS 13
 
 /* Old versions of Arduino pseudo-IDE need these to compile the code **/
+#include <Adafruit_NeoPixel.h>
+#include <ArduinoJson.h>
+#include <ArduinoOTA.h>
+#include <DNSServer.h>
+#include <EEPROM.h>
+#include <ESP8266WebServer.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
-#include <ESP8266WebServer.h>
-#include <ArduinoJson.h>
-#include <DNSServer.h>
 #include <WiFiUdp.h>
-#include <Adafruit_NeoPixel.h>
-#include <EEPROM.h>
 /* Perhaps other later */
 
-#include "LaumioConnect.h"
-#include "LaumioAP.h"
-#include "LaumioLeds.h"
+#include "LaumioConfig.h"
 #include "LaumioHttp.h"
-#include "LaumioApi.h"
+#include "LaumioHttpApi.h"
+#include "LaumioHttpConfig.h"
+#include "LaumioLeds.h"
+#include "LaumioMQTT.h"
 #include "LaumioUdpRemoteControl.h"
+#include "ota_helpers.h"
 
 LaumioLeds leds(NUM_PIXELS, DIN_PIN);
-LaumioHttp httpServer;
-LaumioApi api(leds, httpServer);
+LaumioConfig config;
+
+ESP8266WebServer webserver(80);
+LaumioHttp http_handler(config, webserver);
+LaumioHttpApi http_api_handler(leds, webserver);
+LaumioHttpConfig http_config_path(config, webserver);
+
+DNSServer dns;
+
 LaumioUdpRemoteControl udpRC(leds);
-LaumioAP ap(httpServer);
+LaumioMQTT mqtt_client(leds, config);
 
-LaumioConnect conn;
-int connectCounter = 0;
+bool connect_enabled;
+bool ap_enabled;
+bool apfallback_enabled;
+bool mqtt_enabled;
 
-char const *AP_PASS = "";
+void setup() {
+	Serial.begin(115200);
+	Serial.println("Starting Laumio\n");
 
-char hostString[16] = { 0 };
+	config.readFromEEPROM();
+	if (!strcmp(config.hostname, "")) {
+		char hostString[14];
+		sprintf(hostString, "Laumio_%06X", ESP.getChipId());
+		config.hostname.setValue(hostString);
+	}
 
-void setup()
-{
-    Serial.begin(115200);
-    leds.begin();
-    httpServer.begin();
-    api.begin();
-    delay(1000);
+	connect_enabled = config.connect_enabled;
+	ap_enabled = config.ap_enabled;
+	apfallback_enabled = config.apfallback_enabled;
+	mqtt_enabled = config.mqtt_enabled;
 
-    sprintf(hostString, "Laumio_%06X", ESP.getChipId());
-    Serial.print("Hostname: ");
-    Serial.println(hostString);
+	Serial.print("Hostname: ");
+	Serial.println(config.hostname);
 
-    conn.setHostname(hostString);
+	leds.begin();
+	leds.animate(LaumioLeds::Animation::Clear);
+	leds.animate(LaumioLeds::Animation::Hello);
+
+	webserver.begin();
+	MDNS.addService("http", "tcp", 80);
+	WiFi.hostname(config.hostname);
+	ota_setup(config.hostname);
+
+	Serial.print("Connection to wifi");
+	if (config.connect_enabled && strcmp(config.connect_essid, "")) {
+		Serial.print(": \"");
+		Serial.print(config.connect_essid);
+		Serial.println('"');
+		WiFi.begin(config.connect_essid, config.connect_password);
+	} else {
+		Serial.println(" disabled");
+	}
+
+	Serial.print("Wifi access point");
+	if (config.ap_enabled && strcmp(config.ap_essid, "")) {
+		Serial.print(": \"");
+		Serial.print(config.ap_essid);
+		Serial.print('"');
+		if (WiFi.softAP(config.ap_essid, config.ap_password)) {
+			Serial.print(' ');
+			Serial.println(WiFi.softAPIP());
+			dns.start(53, "*", WiFi.softAPIP());
+		} else {
+			Serial.println(" failed");
+			ap_enabled = false;
+		}
+	} else {
+		WiFi.softAPdisconnect();
+		Serial.println(" disabled");
+	}
+
+	if (mqtt_enabled)
+		mqtt_client.begin();
+	udpRC.begin();
+	MDNS.begin(config.hostname.value());
 }
 
-enum State { off, start, wifi_sta_connecting, wifi_sta_connected,
-        wifi_sta_abort, ready };
-State laumio_state = start;
-State laumio_previous_state = off;
+void loop() {
+	ota_loop();
+	dns.processNextRequest();
+	webserver.handleClient();
+	udpRC.handleMessage();
+	if (mqtt_enabled)
+		mqtt_client.loop();
 
+	// Connection indicator
+	static bool connectionFailed = false;
+	if (connect_enabled && !connectionFailed) {
+		static int connectCounter = 0;
+		if (WiFi.status() != WL_CONNECTED) {
+			if (connectCounter == 10) {
+				leds.colorWipe(0xff3c00, 100);
+				connectCounter++;
+				WiFi.disconnect();
+				Serial.println("Connection failed (too long)");
+				connectionFailed = true;
+			} else {
+				leds.animate(LaumioLeds::Animation::Loading);
+				connectCounter++;
+			}
+		} else if (connectCounter != -1) {
+			Serial.print("Wifi connected: ");
+			Serial.println(WiFi.localIP());
+			leds.animate(LaumioLeds::Animation::Happy);
+			leds.animate(LaumioLeds::Animation::Clear);
+			connectCounter = -1;
+		}
+	} else {
+		connectionFailed = true;
+	}
 
+	// Fallback
+	if (connectionFailed && !ap_enabled) {
+		if (apfallback_enabled) {
+			Serial.print("Access point fallback enabled: \"");
+			Serial.print(config.hostname);
+			Serial.print('"');
 
-void loop()
-{
-    // Changement d'état
-    if (laumio_previous_state != laumio_state) {
-        laumio_previous_state = laumio_state;
-
-        switch (laumio_state) {
-        case ready:
-            leds.animate(LaumioLeds::Animation::Clear);
-            break;
-
-        case wifi_sta_connecting:
-            Serial.println();
-            Serial.print("Wi-Fi: Connecting to '");
-            Serial.print(conn.getAPName());
-            Serial.println("' ...");
-
-            conn.begin();
-            break;
-        case wifi_sta_abort:
-            leds.colorWipe(0xff3c00, 100);
-            delay(3000);
-            ESP.restart();
-            break;
-        }
-    }
-    // État
-    switch (laumio_state) {
-    case start:
-        leds.animate(LaumioLeds::Animation::Hello);
-
-        laumio_state = wifi_sta_connecting;
-        break;
-    case wifi_sta_connecting:
-        if (!conn.isConnected()) {
-            leds.animate(LaumioLeds::Animation::Loading);
-            connectCounter++;
-
-            if (connectCounter > 10) {
-                laumio_state = wifi_sta_abort;
-                Serial.println("Wi-Fi: Too long, abort.");
-            }
-        } else {
-            Serial.println("Wi-Fi: Connected.");
-            laumio_state = wifi_sta_connected;
-        }
-        break;
-    case wifi_sta_connected:
-        leds.animate(LaumioLeds::Animation::Happy);
-        udpRC.begin();
-        MDNS.begin(hostString);
-        laumio_state = ready;
-        break;
-    case wifi_sta_abort:
-        ap.acceptDNS();
-        httpServer.handleClient();
-    case ready:
-        httpServer.handleClient();
-        udpRC.handleMessage();
-        break;
-    }
+			if (WiFi.softAP(config.hostname, "")) {
+				Serial.print(' ');
+				Serial.println(WiFi.softAPIP());
+				dns.start(53, "*", WiFi.softAPIP());
+				ap_enabled = true;
+			} else {
+				Serial.println(" failed");
+				delay(3000);
+				ESP.restart();
+			}
+		} else {
+			delay(3000);
+			ESP.restart();
+		}
+	}
 }

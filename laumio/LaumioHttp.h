@@ -1,26 +1,21 @@
 #ifndef LAUMIOHTTP_H
 #define LAUMIOHTTP_H
 
-#include <ESP8266WiFi.h>
+#include "LaumioConfig.h"
 #include <ESP8266WebServer.h>
+#include <ESP8266WiFi.h>
 
 class LaumioHttp {
   public:
-
-    LaumioHttp();
-
-    void begin();
-    void handleClient();
-    void handleRoot();
+	LaumioHttp(LaumioConfig &c, ESP8266WebServer &s);
+	static bool testCaptive(ESP8266WebServer &server);
 
   private:
+	ESP8266WebServer &server;
+	LaumioConfig &config;
 
-     ESP8266WebServer server;
-
-    void handleNotFound();
-
-    friend class LaumioApi;
-    friend class LaumioAP;
+	void handleNotFound();
+	void handleRoot();
 };
 
-#endif                          // LAUMIOHTTP_H
+#endif
