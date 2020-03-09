@@ -81,9 +81,10 @@ void setup() {
 	leds.animate(LaumioLeds::Animation::Clear);
 	leds.animate(LaumioLeds::Animation::Hello);
 
+	 
 	webserver.begin();
-	MDNS.addService("http", "tcp", 80);
-	WiFi.hostname(config.hostname);
+  // MDNS.addService("http", "tcp", 80);
+  WiFi.hostname(config.hostname);
 	ota_setup(config.hostname);
 
 	Serial.print("Connection to wifi");
@@ -118,6 +119,7 @@ void setup() {
 		mqtt_client.begin();
 	udpRC.begin();
 	MDNS.begin(config.hostname.value());
+  /**/
 }
 
 void loop() {
