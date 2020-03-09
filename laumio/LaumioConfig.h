@@ -45,17 +45,17 @@ class LaumioConfig {
 	 *       invalidate older versions. Do not increment if you only
 	 *       add data at the end.
 	 */
-	const unsigned char VERSION{1};
+	const unsigned char VERSION{2};
 
 	ConfigString<32> hostname;
 
 	ConfigBool connect_enabled;
 	ConfigString<32> connect_essid;
-	ConfigString<32> connect_password;
+	ConfigString<64> connect_password;
 
 	ConfigBool ap_enabled;
 	ConfigString<32> ap_essid;
-	ConfigString<32> ap_password;
+	ConfigString<64> ap_password;
 
 	ConfigBool apfallback_enabled{true};
 
