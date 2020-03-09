@@ -81,10 +81,11 @@ void setup() {
 	leds.animate(LaumioLeds::Animation::Clear);
 	leds.animate(LaumioLeds::Animation::Hello);
 
-	 
+
 	webserver.begin();
-  // MDNS.addService("http", "tcp", 80);
-  WiFi.hostname(config.hostname);
+	WiFi.hostname(config.hostname);
+  MDNS.begin(config.hostname);
+	MDNS.addService("http", "tcp", 80);
 	ota_setup(config.hostname);
 
 	Serial.print("Connection to wifi");
