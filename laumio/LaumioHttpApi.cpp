@@ -10,8 +10,8 @@ void LaumioHttpApi::handleApi() {
 	if (LaumioHttp::testCaptive(server))
 		return;
 
-	StaticJsonBuffer<200> jsonBufferAnswer;
-	JsonObject &answer = jsonBufferAnswer.createObject();
+	StaticJsonDocument<200> jsonBufferAnswer;
+	JsonObject answer = jsonBufferAnswer.createNestedObject();
 	int answerCode = 200;
 
 	if (server.method() == HTTP_GET) {
@@ -21,8 +21,8 @@ void LaumioHttpApi::handleApi() {
 	} else {
 		bool success = false;
 		if (server.args() > 0) {
-			StaticJsonBuffer<200> jsonBufferQuery;
-			JsonObject &query = jsonBufferQuery.createObject();
+			StaticJsonDocument<200> jsonBufferQuery;
+			JsonObject query = jsonBufferQuery.createNestedObject();
 			for (int i = 0; i < server.args(); i++) {
 				query[server.argName(i)] = server.arg(i);
 			}
@@ -46,6 +46,6 @@ void LaumioHttpApi::handleApi() {
 	}
 
 	String answerJsonStr;
-	answer.printTo(answerJsonStr);
+	serializeJson(answer, answerJsonStr);
 	server.send(answerCode, "application/json", answerJsonStr);
 }

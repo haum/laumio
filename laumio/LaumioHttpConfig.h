@@ -14,7 +14,7 @@ class LaumioHttpConfig {
 	ESP8266WebServer &server;
 	LaumioConfig &config;
 
-	bool jsonCommands(JsonObject &jo);
+	bool jsonCommands(JsonObject jo);
 	void handleConfig();
 };
 

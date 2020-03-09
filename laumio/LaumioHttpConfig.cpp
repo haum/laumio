@@ -6,19 +6,19 @@ LaumioHttpConfig::LaumioHttpConfig(LaumioConfig &c, ESP8266WebServer &s)
 	server.on("/config", std::bind(&LaumioHttpConfig::handleConfig, this));
 }
 
-bool LaumioHttpConfig::jsonCommands(JsonObject &jo) {
-	String cmd = jo["command"].asString();
+bool LaumioHttpConfig::jsonCommands(JsonObject jo) {
+	String cmd = jo["command"];
 	if (cmd == "config_connect") {
 		config.connect_enabled.setValue(jo.containsKey("enabled"));
-		config.connect_essid.setValue(jo["essid"].asString());
-		config.connect_password.setValue(jo["password"].asString());
+		config.connect_essid.setValue(jo["essid"]);
+		config.connect_password.setValue(jo["password"]);
 		config.saveToEEPROM();
 		return true;
 
 	} else if (cmd == "config_ap") {
 		config.ap_enabled.setValue(jo.containsKey("enabled"));
-		config.ap_essid.setValue(jo["essid"].asString());
-		config.ap_password.setValue(jo["password"].asString());
+		config.ap_essid.setValue(jo["essid"]);
+		config.ap_password.setValue(jo["password"]);
 		config.saveToEEPROM();
 		return true;
 
@@ -29,9 +29,9 @@ bool LaumioHttpConfig::jsonCommands(JsonObject &jo) {
 
 	} else if (cmd == "config_mqtt") {
 		config.mqtt_enabled.setValue(jo.containsKey("enabled"));
-		config.mqtt_host.setValue(jo["host"].asString());
-		config.mqtt_user.setValue(jo["user"].asString());
-		config.mqtt_password.setValue(jo["password"].asString());
+		config.mqtt_host.setValue(jo["host"]);
+		config.mqtt_user.setValue(jo["user"]);
+		config.mqtt_password.setValue(jo["password"]);
 		config.saveToEEPROM();
 		return true;
 
@@ -46,23 +46,23 @@ void LaumioHttpConfig::handleConfig() {
 	if (LaumioHttp::testCaptive(server))
 		return;
 
-	StaticJsonBuffer<200> jsonBufferAnswer;
-	JsonObject &answer = jsonBufferAnswer.createObject();
+	StaticJsonDocument<200> jsonBufferAnswer;
+	JsonObject answer = jsonBufferAnswer.createNestedObject();
 	int answerCode = 200;
 
 	bool success = false;
 	if (server.args() > 0) {
-		StaticJsonBuffer<200> jsonBufferQuery;
-		JsonObject &query = jsonBufferQuery.createObject();
+		StaticJsonDocument<200> jsonBufferQuery;
+		JsonObject query = jsonBufferQuery.createNestedObject();
 		for (int i = 0; i < server.args(); i++) {
 			query[server.argName(i)] = server.arg(i);
 		}
 		success = jsonCommands(query);
 
 	} else if (server.hasArg("plain")) {
-		StaticJsonBuffer<800> jsonBuffer;
-		JsonObject &obj = jsonBuffer.parseObject(server.arg("plain"));
-		success = obj.success() && jsonCommands(obj);
+		StaticJsonDocument<800> jsonBuffer;
+		auto deserializeStatus = deserializeJson(jsonBuffer, server.arg("plain"));
+		success = (deserializeStatus == DeserializationError::Ok) && jsonCommands(jsonBuffer.as<JsonObject>());
 	}
 
 	if (success) {
@@ -77,6 +77,6 @@ void LaumioHttpConfig::handleConfig() {
 	}
 
 	String answerJsonStr;
-	answer.printTo(answerJsonStr);
+	serializeJson(answer, answerJsonStr);
 	server.send(answerCode, "application/json", answerJsonStr);
 }

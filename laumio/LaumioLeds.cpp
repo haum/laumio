@@ -144,12 +144,12 @@ uint32_t LaumioLeds::wheel(byte wheelPos) {
 }
 
 bool LaumioLeds::jsonCommands(const char *str) {
-	StaticJsonBuffer<800> jsonBuffer;
-	JsonObject &obj = jsonBuffer.parseObject(str);
-	return obj.success() && jsonCommands(obj);
+	StaticJsonDocument<800> jsonBuffer;
+	auto deserializeStatus = deserializeJson(jsonBuffer, str);
+	return (deserializeStatus == DeserializationError::Ok) && jsonCommands(jsonBuffer.as<JsonObject>());
 }
 
-bool LaumioLeds::jsonCommands(JsonObject &jo) {
+bool LaumioLeds::jsonCommands(JsonObject jo) {
 	if (jo.containsKey("commands")) {
 		if (!jo["commands"].is<JsonArray>())
 			return false;
@@ -165,7 +165,7 @@ bool LaumioLeds::jsonCommands(JsonObject &jo) {
 		int g = jo["rgb"][1];
 		int b = jo["rgb"][2];
 		if (jo["rgb"].is<const char *>()) {
-			auto colorstr = jo["rgb"].asString();
+			const char * colorstr = jo["rgb"];
 			if (colorstr[0] == '#' && strlen(colorstr) == 7) {
 				int color = strtol(colorstr + 1, nullptr, 16);
 				r = (color >> 16) & 0xff;

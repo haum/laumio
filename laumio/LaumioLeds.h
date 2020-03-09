@@ -60,7 +60,7 @@ class LaumioLeds {
 	uint32_t wheel(byte wheelPos);
 
 	bool jsonCommands(const char *str);
-	bool jsonCommands(JsonObject &jo);
+	bool jsonCommands(JsonObject jo);
 
   private:
 	Adafruit_NeoPixel strip;
