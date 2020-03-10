@@ -84,8 +84,9 @@ void setup() {
 
 	webserver.begin();
 	WiFi.hostname(config.hostname);
-  MDNS.begin(config.hostname);
-	MDNS.addService("http", "tcp", 80);
+	if (MDNS.begin(config.hostname)){
+		MDNS.addService("http", "tcp", 80);
+    }
 	ota_setup(config.hostname);
 
 	Serial.print("Connection to wifi");
